@@ -43,10 +43,12 @@ course_schedule/
 - MySQL：关系型数据库
 - Viper：配置管理
 - GORM：ORM库
+- Air：热重载工具
 
 ### 前端
 
 - Vue3：渐进式JavaScript框架
+- Vite：现代前端构建工具，提供更快的开发体验
 - ArcoDesign：字节跳动开源的企业级设计系统
 - Vue Router：路由管理
 - Pinia：状态管理
@@ -64,12 +66,17 @@ course_schedule/
 6. 运行 `go mod tidy` 安装依赖
 7. 运行 `go run cmd/app/main.go` 启动后端服务
 
+#### 使用热重载（可选）
+
+1. 安装Air: `go install github.com/cosmtrek/air@latest`
+2. 在backend目录下运行: `air`
+
 ### 前端
 
 1. 安装Node.js（14+）
-2. 进入frontend目录
+2. 进入frontend-vite目录
 3. 运行 `npm install` 安装依赖
-4. 运行 `npm run serve` 启动开发服务器
+4. 运行 `npm run dev` 启动开发服务器
 
 ## 部署
 
@@ -81,7 +88,7 @@ course_schedule/
 
 ### 前端
 
-1. 进入frontend目录
+1. 进入frontend-vite目录
 2. 运行 `npm run build` 构建
 3. 将dist目录部署到Web服务器
 
