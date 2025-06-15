@@ -22,11 +22,11 @@ func NewCourseHandler(courseService service.CourseService) *CourseHandler {
 
 // Register 注册路由
 func (h *CourseHandler) Register(e *echo.Echo) {
-	e.GET("/api/courses", h.GetAllCourses)
-	e.GET("/api/courses/:id", h.GetCourseByID)
-	e.POST("/api/courses", h.CreateCourse)
-	e.PUT("/api/courses/:id", h.UpdateCourse)
-	e.DELETE("/api/courses/:id", h.DeleteCourse)
+	e.GET("/courses", h.GetAllCourses)
+	e.GET("/courses/:id", h.GetCourseByID)
+	e.POST("/courses", h.CreateCourse)
+	e.PUT("/courses/:id", h.UpdateCourse)
+	e.DELETE("/courses/:id", h.DeleteCourse)
 }
 
 // GetAllCourses 获取所有课程

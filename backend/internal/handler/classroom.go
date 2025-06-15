@@ -22,11 +22,11 @@ func NewClassroomHandler(classroomService service.ClassroomService) *ClassroomHa
 
 // Register 注册路由
 func (h *ClassroomHandler) Register(e *echo.Echo) {
-	e.GET("/api/classrooms", h.GetAllClassrooms)
-	e.GET("/api/classrooms/:id", h.GetClassroomByID)
-	e.POST("/api/classrooms", h.CreateClassroom)
-	e.PUT("/api/classrooms/:id", h.UpdateClassroom)
-	e.DELETE("/api/classrooms/:id", h.DeleteClassroom)
+	e.GET("/classrooms", h.GetAllClassrooms)
+	e.GET("/classrooms/:id", h.GetClassroomByID)
+	e.POST("/classrooms", h.CreateClassroom)
+	e.PUT("/classrooms/:id", h.UpdateClassroom)
+	e.DELETE("/classrooms/:id", h.DeleteClassroom)
 }
 
 // GetAllClassrooms 获取所有教室

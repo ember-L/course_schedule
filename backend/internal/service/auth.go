@@ -5,6 +5,7 @@ import (
 	"course_schedule/internal/repository"
 	"course_schedule/pkg/auth"
 	"errors"
+	"fmt"
 )
 
 // AuthService 认证服务接口
@@ -55,10 +56,11 @@ func (s *authService) AdminLogin(username, password string) (*model.LoginRespons
 	if admin == nil {
 		return nil, errors.New("用户名或密码错误")
 	}
-
+	hashedPassword, err := repository.HashPassword(password)
+	fmt.Println("admin:", admin.Password, "password:", hashedPassword)
 	// 验证密码
 	if !repository.CheckPasswordHash(password, admin.Password) {
-		return nil, errors.New("用户名或密码错误")
+		return nil, errors.New("密码错误")
 	}
 
 	// 生成令牌

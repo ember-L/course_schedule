@@ -22,12 +22,12 @@ func NewStudentHandler(studentService service.StudentService) *StudentHandler {
 
 // Register 注册路由
 func (h *StudentHandler) Register(e *echo.Echo) {
-	e.GET("/api/students", h.GetAllStudents)
-	e.GET("/api/students/:id", h.GetStudentByID)
-	e.GET("/api/students/studentId/:studentId", h.GetStudentByStudentID)
-	e.POST("/api/students", h.CreateStudent)
-	e.PUT("/api/students/:id", h.UpdateStudent)
-	e.DELETE("/api/students/:id", h.DeleteStudent)
+	e.GET("/students", h.GetAllStudents)
+	e.GET("/students/:id", h.GetStudentByID)
+	e.GET("/students/studentId/:studentId", h.GetStudentByStudentID)
+	e.POST("/students", h.CreateStudent)
+	e.PUT("/students/:id", h.UpdateStudent)
+	e.DELETE("/students/:id", h.DeleteStudent)
 }
 
 // GetAllStudents 获取所有学生

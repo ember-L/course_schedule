@@ -24,7 +24,7 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 // Register 注册路由
 func (h *AuthHandler) Register(e *echo.Echo) {
 	// 管理员认证
-	e.POST("/api/admin/login", h.AdminLogin)
+	e.POST("/admin/login", h.AdminLogin)
 	e.GET("/api/admin/profile", h.GetAdminProfile, h.AuthMiddleware("admin"))
 
 	e.POST("/teacher/login", h.TeacherLogin)

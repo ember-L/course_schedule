@@ -22,13 +22,13 @@ func NewEnrollmentHandler(enrollmentService service.EnrollmentService) *Enrollme
 
 // Register 注册路由
 func (h *EnrollmentHandler) Register(e *echo.Echo) {
-	e.GET("/api/enrollments", h.GetAllEnrollments)
-	e.GET("/api/enrollments/:id", h.GetEnrollmentByID)
-	e.GET("/api/enrollments/student/:studentId", h.GetEnrollmentsByStudentID)
-	e.GET("/api/enrollments/section/:sectionId", h.GetEnrollmentsBySectionID)
-	e.POST("/api/enrollments", h.EnrollCourse)
-	e.PUT("/api/enrollments/:id", h.UpdateEnrollment)
-	e.DELETE("/api/enrollments/:id", h.DeleteEnrollment)
+	e.GET("/enrollments", h.GetAllEnrollments)
+	e.GET("/enrollments/:id", h.GetEnrollmentByID)
+	e.GET("/enrollments/student/:studentId", h.GetEnrollmentsByStudentID)
+	e.GET("/enrollments/section/:sectionId", h.GetEnrollmentsBySectionID)
+	e.POST("/enrollments", h.EnrollCourse)
+	e.PUT("/enrollments/:id", h.UpdateEnrollment)
+	e.DELETE("/enrollments/:id", h.DeleteEnrollment)
 }
 
 // GetAllEnrollments 获取所有选课记录
@@ -89,7 +89,7 @@ func (h *EnrollmentHandler) EnrollCourse(c echo.Context) error {
 		StudentID uint `json:"studentId"`
 		SectionID uint `json:"sectionId"`
 	}
-	
+
 	req := new(EnrollRequest)
 	if err := c.Bind(req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})

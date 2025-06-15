@@ -22,11 +22,11 @@ func NewTeacherHandler(teacherService service.TeacherService) *TeacherHandler {
 
 // Register 注册路由
 func (h *TeacherHandler) Register(e *echo.Echo) {
-	e.GET("/api/teachers", h.GetAllTeachers)
-	e.GET("/api/teachers/:id", h.GetTeacherByID)
-	e.POST("/api/teachers", h.CreateTeacher)
-	e.PUT("/api/teachers/:id", h.UpdateTeacher)
-	e.DELETE("/api/teachers/:id", h.DeleteTeacher)
+	e.GET("/teachers", h.GetAllTeachers)
+	e.GET("/teachers/:id", h.GetTeacherByID)
+	e.POST("/teachers", h.CreateTeacher)
+	e.PUT("/teachers/:id", h.UpdateTeacher)
+	e.DELETE("/teachers/:id", h.DeleteTeacher)
 }
 
 // GetAllTeachers 获取所有教师

@@ -22,11 +22,11 @@ func NewTimeSlotHandler(timeSlotService service.TimeSlotService) *TimeSlotHandle
 
 // Register 注册路由
 func (h *TimeSlotHandler) Register(e *echo.Echo) {
-	e.GET("/api/timeSlots", h.GetAllTimeSlots)
-	e.GET("/api/timeSlots/:id", h.GetTimeSlotByID)
-	e.POST("/api/timeSlots", h.CreateTimeSlot)
-	e.PUT("/api/timeSlots/:id", h.UpdateTimeSlot)
-	e.DELETE("/api/timeSlots/:id", h.DeleteTimeSlot)
+	e.GET("/timeSlots", h.GetAllTimeSlots)
+	e.GET("/timeSlots/:id", h.GetTimeSlotByID)
+	e.POST("/timeSlots", h.CreateTimeSlot)
+	e.PUT("/timeSlots/:id", h.UpdateTimeSlot)
+	e.DELETE("/timeSlots/:id", h.DeleteTimeSlot)
 }
 
 // GetAllTimeSlots 获取所有时间段

@@ -18,7 +18,7 @@
               <a-menu-item key="/students" v-if="isAdmin">学生管理</a-menu-item>
               <a-menu-item key="/enrollments">选课管理</a-menu-item>
               <a-menu-item key="/schedule">课表查询</a-menu-item>
-              <a-menu-item key="/api-test" v-if="isAdmin">API测试</a-menu-item>
+              <!-- <a-menu-item key="/api-test" v-if="isAdmin">API测试</a-menu-item> -->
             </a-menu>
             <div class="user-info">
               <a-dropdown trigger="click">

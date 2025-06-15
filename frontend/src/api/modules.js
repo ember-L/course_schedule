@@ -1,4 +1,4 @@
-import api from './index';
+import api from '@/api/index';
 
 // 课程相关API
 export const courseApi = {

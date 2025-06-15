@@ -49,9 +49,8 @@ const rules = {
 };
 
 const handleLogin = async () => {
-  formRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true;
+  
+
       try {
         await authStore.login(form.userType, form.username, form.password);
         Message.success('登录成功');
@@ -68,9 +67,7 @@ const handleLogin = async () => {
         Message.error('登录失败：' + (error.message || '用户名或密码错误'));
       } finally {
         loading.value = false;
-      }
-    }
-  });
+      };
 };
 </script>
 
