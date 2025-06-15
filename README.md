@@ -27,6 +27,52 @@ course_schedule/
         └── views/       # 页面视图
 ```
 
+
+
+## 快速开始
+
+克隆仓库
+
+```sh
+git clone https://github.com/ember-L/course_schedule.git
+```
+
+
+
+### 后端
+
+1. 安装Go（1.16+）和MySQL
+2. 克隆仓库：
+3. 配置数据库
+```sql
+CREATE DATABASE course_schedule CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+4. 修改配置文件 `backend/config/config.yaml`
+5. 运行后端服务
+
+```sh
+cd backend
+go mod tidy
+go run cmd/app/main.go
+```
+
+#### 使用热重载（可选）
+
+1. 安装Air: `go install github.com/cosmtrek/air@latest`
+2. 在backend目录下运行: `air`
+
+### 前端
+
+1. 安装Node.js（16+）
+2. 安装依赖并启动开发服务器
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 ## 功能特性
 
 - 课程管理：添加、编辑、删除课程信息
@@ -54,43 +100,42 @@ course_schedule/
 - Pinia：状态管理
 - Axios：HTTP客户端
 
-## 开发环境设置
 
-### 后端
 
-1. 安装Go（1.16+）
-2. 安装MySQL
-3. 克隆仓库
-4. 进入backend目录
-5. 修改config/config.yaml中的数据库配置
-6. 运行 `go mod tidy` 安装依赖
-7. 运行 `go run cmd/app/main.go` 启动后端服务
+## 开发指南
 
-#### 使用热重载（可选）
+### 后端开发
 
-1. 安装Air: `go install github.com/cosmtrek/air@latest`
-2. 在backend目录下运行: `air`
+1. 使用Air实现热重载
 
-### 前端
+```bash
+cd backend
+air
+```
 
-1. 安装Node.js（14+）
-2. 进入frontend-vite目录
-3. 运行 `npm install` 安装依赖
-4. 运行 `npm run dev` 启动开发服务器
+1. 添加新的API端点在 `internal/model`中定义模型
 
-## 部署
+2. 在 `internal/repository`中实现数据访问
 
-### 后端
+3. 在 `internal/service`中实现业务逻辑
 
-1. 进入backend目录
-2. 运行 `go build -o app cmd/app/main.go` 编译
-3. 将编译后的二进制文件和config目录一起部署
+4. 在 `internal/handler`中实现HTTP处理器
 
-### 前端
+   
 
-1. 进入frontend-vite目录
-2. 运行 `npm run build` 构建
-3. 将dist目录部署到Web服务器
+### 前端开发
+
+1. 添加新的页面
+2. 在 `src/views`中创建Vue组件
+3. 在 `src/router/index.js`中添加路由
+4. 在 `src/api`中添加API调用
+5. 构建生产版本
+
+```bash
+npm run build
+```
+
+
 
 ## 数据库设计
 
