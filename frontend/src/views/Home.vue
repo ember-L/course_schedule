@@ -1,67 +1,118 @@
 <template>
-  <div class="dashboard-container">
-    <!-- 日期和欢迎信息 -->
-    <a-row :gutter="16" class="welcome-section">
-      <a-col :span="16">
-        <a-card>
-          <div class="welcome-content">
-            <div class="date-info">
-              <div class="current-date">{{ formattedDate }}</div>
-              <div class="day-of-week">{{ dayOfWeek }}</div>
+  <div class="page-container fade-in">
+    <!-- 页面头部 -->
+    <div class="page-header">
+      <h1 class="page-title">欢迎回来，{{ userInfo.name }}</h1>
+      <p class="page-subtitle">{{ welcomeMessage }}</p>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="card-grid">
+      <div class="statistic-card">
+        <div class="statistic-content">
+          <div class="statistic-icon">
+            <icon-calendar />
+          </div>
+          <div class="statistic-info">
+            <div class="statistic-value">{{ formattedDate }}</div>
+            <div class="statistic-label">{{ dayOfWeek }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="statistic-card">
+        <div class="statistic-content">
+          <div class="statistic-icon">
+            <icon-book />
+          </div>
+          <div class="statistic-info">
+            <div class="statistic-value">{{ currentSemester }}</div>
+            <div class="statistic-label">当前学期</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="statistic-card">
+        <div class="statistic-content">
+          <div class="statistic-icon">
+            <icon-clock-circle />
+          </div>
+          <div class="statistic-info">
+            <div class="statistic-value">第{{ currentWeek }}周</div>
+            <div class="statistic-label">当前周次</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+      <!-- 当日课表 -->
+      <a-card class="schedule-card" title="今日课表">
+        <template #extra>
+          <a-tag :color="todayClasses.length > 0 ? 'green' : 'orange'">
+            {{ todayClasses.length > 0 ? `${todayClasses.length} 门课程` : '今日无课' }}
+          </a-tag>
+        </template>
+        
+        <a-spin :loading="loading">
+          <template v-if="todayClasses.length > 0">
+            <div class="timeline-container">
+              <a-timeline>
+                <a-timeline-item 
+                  v-for="course in todayClasses" 
+                  :key="course.id"
+                  :dot-color="getTimeStatus(course.startTime, course.endTime)"
+                >
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <span class="course-time">{{ course.startTime }} - {{ course.endTime }}</span>
+                      <span class="course-name">{{ course.courseName }}</span>
+                    </div>
+                    <div class="timeline-details">
+                      <div class="detail-item">
+                        <icon-user class="detail-icon" />
+                        <span>{{ course.teacherName }}</span>
+                      </div>
+                      <div class="detail-item">
+                        <icon-location class="detail-icon" />
+                        <span>{{ course.classroom }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </a-timeline-item>
+              </a-timeline>
             </div>
-            <div class="welcome-text">
-              <h2>欢迎回来，{{ userInfo.name }}</h2>
-              <p>{{ welcomeMessage }}</p>
+          </template>
+          <a-empty v-else description="今日没有课程安排，好好休息一下吧！" />
+        </a-spin>
+      </a-card>
+
+      <!-- 通知公告 -->
+      <a-card class="announcements-card" title="通知公告">
+        <template #extra>
+          <a-button type="text" size="small">
+            <icon-more />
+          </a-button>
+        </template>
+        
+        <div class="announcements-list">
+          <div 
+            v-for="(notice, index) in announcements" 
+            :key="index"
+            class="announcement-item"
+          >
+            <div class="announcement-content">
+              <div class="announcement-title">{{ notice.title }}</div>
+              <div class="announcement-date">{{ notice.date }}</div>
+            </div>
+            <div class="announcement-badge">
+              <a-tag size="small" color="blue">新</a-tag>
             </div>
           </div>
-        </a-card>
-      </a-col>
-      <a-col :span="8">
-        <a-card title="系统概览">
-          <a-statistic title="学期" :value="currentSemester" />
-          <a-divider style="margin: 16px 0" />
-          <a-statistic title="周次" :value="currentWeek" />
-        </a-card>
-      </a-col>
-    </a-row>
-
-    <!-- 当日课表 -->
-    <a-card title="今日课表" class="today-schedule">
-      <a-spin :loading="loading">
-        <template v-if="todayClasses.length > 0">
-          <a-timeline>
-            <a-timeline-item 
-              v-for="course in todayClasses" 
-              :key="course.id"
-              :dot-color="getTimeStatus(course.startTime, course.endTime)"
-            >
-              <div class="timeline-title">
-                <span class="course-time">{{ course.startTime }} - {{ course.endTime }}</span>
-                <span class="course-name">{{ course.courseName }}</span>
-              </div>
-              <div class="timeline-content">
-                <p><icon-user /> 教师: {{ course.teacherName }}</p>
-                <p><icon-location /> 教室: {{ course.classroom }}</p>
-              </div>
-            </a-timeline-item>
-          </a-timeline>
-        </template>
-        <a-empty v-else description="今日没有课程安排" />
-      </a-spin>
-    </a-card>
-
-    <!-- 通知公告 -->
-    <a-card title="通知公告" class="announcements">
-      <a-list>
-        <a-list-item v-for="(notice, index) in announcements" :key="index">
-          <a-list-item-meta :title="notice.title">
-            <template #description>
-              <span>{{ notice.date }}</span>
-            </template>
-          </a-list-item-meta>
-        </a-list-item>
-      </a-list>
-    </a-card>
+        </div>
+      </a-card>
+    </div>
   </div>
 </template>
 
@@ -183,80 +234,159 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dashboard-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+.main-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
 }
 
-.welcome-section {
-  margin-bottom: 20px;
+.schedule-card {
+  height: fit-content;
 }
 
-.welcome-content {
+.announcements-card {
+  height: fit-content;
+}
+
+.timeline-container {
+  padding: var(--spacing-md) 0;
+}
+
+.timeline-content {
+  padding: var(--spacing-sm) 0;
+}
+
+.timeline-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-}
-
-.date-info {
-  margin-right: 24px;
-  text-align: center;
-  padding-right: 24px;
-  border-right: 1px solid #e5e5e5;
-}
-
-.current-date {
-  font-size: 16px;
-  color: #333;
-}
-
-.day-of-week {
-  font-size: 24px;
-  font-weight: bold;
-  color: #165dff;
-  margin-top: 4px;
-}
-
-.welcome-text h2 {
-  margin-top: 0;
-  margin-bottom: 8px;
-}
-
-.welcome-text p {
-  margin: 0;
-  color: #666;
-}
-
-.today-schedule {
-  margin-bottom: 20px;
-}
-
-.timeline-title {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .course-time {
-  font-weight: bold;
-  margin-right: 12px;
-  color: #666;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .course-name {
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.timeline-content {
-  color: #666;
+.timeline-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
-.timeline-content p {
-  margin: 4px 0;
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
-.announcements {
-  margin-bottom: 20px;
+.detail-icon {
+  color: var(--primary-color);
+}
+
+.announcements-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.announcement-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: var(--bg-tertiary);
+  border-radius: var(--border-radius-medium);
+  transition: all 0.2s ease;
+}
+
+.announcement-item:hover {
+  background-color: var(--primary-light);
+  transform: translateX(4px);
+}
+
+.announcement-content {
+  flex: 1;
+}
+
+.announcement-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.announcement-date {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.statistic-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.statistic-icon {
+  font-size: 32px;
+  opacity: 0.8;
+}
+
+.statistic-info {
+  flex: 1;
+}
+
+.statistic-value {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.statistic-label {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: var(--spacing-lg);
+  }
+  
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .timeline-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+  
+  .statistic-content {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-md);
+  }
 }
 </style>

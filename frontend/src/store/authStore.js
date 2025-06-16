@@ -3,7 +3,7 @@ import { authApi } from '../api/auth';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
     token: localStorage.getItem('token') || null,
     userType: localStorage.getItem('userType') || null,
     loading: false
@@ -40,6 +40,7 @@ export const useAuthStore = defineStore('auth', {
         // 存储到本地存储
         localStorage.setItem('token', response.token);
         localStorage.setItem('userType', userType);
+        localStorage.setItem('user', JSON.stringify(response.user));
         
         return response;
       } finally {
@@ -62,10 +63,11 @@ export const useAuthStore = defineStore('auth', {
         // 清除本地存储
         localStorage.removeItem('token');
         localStorage.removeItem('userType');
+        localStorage.removeItem('user');
       }
     },
     
-    async fetchCurrentUser() {
+    async fetchCurrentUser(autoLogout = true) {
       if (!this.token) return null;
       
       this.loading = true;
@@ -81,12 +83,15 @@ export const useAuthStore = defineStore('auth', {
           response = await authApi.getStudentProfile();
         }
         
-        this.user = response;
+        this.user = response.user;
+        localStorage.setItem('user', JSON.stringify(response.user));
         return response;
       } catch (error) {
         console.error('获取用户信息失败', error);
-        // 如果获取用户信息失败，可能是token过期，执行登出操作
-        this.logout();
+        // 只有在明确要求时才执行登出操作
+        if (autoLogout) {
+          this.logout();
+        }
         return null;
       } finally {
         this.loading = false;
@@ -94,11 +99,31 @@ export const useAuthStore = defineStore('auth', {
     },
     
     // 初始化认证状态
-    init() {
+    async init() {
       if (this.token) {
-        // 获取当前用户信息
-        this.fetchCurrentUser();
+        // 优先用本地 user 信息
+        if (!this.user) {
+          const localUser = localStorage.getItem('user');
+          if (localUser) {
+            try {
+              this.user = JSON.parse(localUser);
+            } catch (error) {
+              console.error('解析本地用户信息失败', error);
+            }
+          }
+        }
+        
+        // 异步拉取最新用户信息，但不影响初始化状态
+        try {
+          await this.fetchCurrentUser(false); // 不自动登出
+        } catch (error) {
+          console.error('拉取用户信息失败，使用本地信息', error);
+          // 不执行 logout，保持当前状态
+        }
+        
+        return this.user;
       }
+      return null;
     }
   }
 });

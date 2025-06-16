@@ -63,12 +63,6 @@ const routes = [
     component: () => import('../views/ChangePassword.vue'),
     meta: { requiresAuth: true }
   },
-  {
-    path: '/api-test',
-    name: 'ApiTest',
-    component: () => import('../views/ApiTest.vue'),
-    meta: { requiresAuth: false }
-  }
 ];
 
 const router = createRouter({
@@ -77,9 +71,23 @@ const router = createRouter({
 });
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth !== false);
+  
+  // 如果有token但没有用户信息，尝试拉取用户信息但不自动登出
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.fetchCurrentUser(false); // 不自动登出
+    } catch (error) {
+      console.error('拉取用户信息失败', error);
+      // 只有在明确需要认证的页面才登出
+      if (requiresAuth) {
+        await authStore.logout();
+      }
+    }
+  }
+  
   const isAuthenticated = authStore.isAuthenticated;
   
   // 如果需要认证但未登录，重定向到登录页

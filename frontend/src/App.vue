@@ -1,154 +1,101 @@
 <template>
   <a-config-provider>
     <div class="app-container">
-      <a-layout v-if="isAuthenticated">
-        <a-layout-header>
-          <div class="header-content">
-            <div class="logo">高校排课系统</div>
-            <a-menu
-              mode="horizontal"
-              :selected-keys="[activeKey]"
-              @menu-item-click="handleMenuClick"
-            >
-              <a-menu-item key="/">首页</a-menu-item>
-              <a-menu-item key="/courses" v-if="isAdmin || isTeacher">课程管理</a-menu-item>
-              <a-menu-item key="/teachers" v-if="isAdmin">教师管理</a-menu-item>
-              <a-menu-item key="/classrooms" v-if="isAdmin">教室管理</a-menu-item>
-              <a-menu-item key="/sections" v-if="isAdmin || isTeacher">排课管理</a-menu-item>
-              <a-menu-item key="/students" v-if="isAdmin">学生管理</a-menu-item>
-              <a-menu-item key="/enrollments">选课管理</a-menu-item>
-              <a-menu-item key="/schedule">课表查询</a-menu-item>
-              <!-- <a-menu-item key="/api-test" v-if="isAdmin">API测试</a-menu-item> -->
-            </a-menu>
-            <div class="user-info">
-              <a-dropdown trigger="click">
-                <a-button type="text">
-                  {{ userInfo.name || '用户' }}
-                  <icon-down />
-                </a-button>
-                <template #content>
-                  <a-doption>
-                    <a-space>
-                      <icon-user />
-                      <span>{{ userTypeText }}</span>
-                    </a-space>
-                  </a-doption>
-                  <a-doption @click="$router.push('/change-password')">
-                    <a-space>
-                      <icon-lock />
-                      <span>修改密码</span>
-                    </a-space>
-                  </a-doption>
-                  <a-doption @click="handleLogout">
-                    <a-space>
-                      <icon-export />
-                      <span>退出登录</span>
-                    </a-space>
-                  </a-doption>
-                </template>
-              </a-dropdown>
-            </div>
+      <div v-if="loading" class="global-loading">
+        <div class="loading-content">
+          <div class="loading-logo">
+            <icon-book />
           </div>
-        </a-layout-header>
-        
-        <a-layout-content>
+          <div class="loading-text">高校排课系统</div>
+          <a-spin size="large" />
+        </div>
+      </div>
+      <template v-else>
+        <!-- 登录页面不显示 Header 和 Footer -->
+        <template v-if="isLoginPage">
           <router-view />
-        </a-layout-content>
-        
-        <a-layout-footer>
-          <div class="footer-content">
-            高校排课系统 &copy; {{ new Date().getFullYear() }}
+        </template>
+        <!-- 其他页面显示完整的布局 -->
+        <template v-else>
+          <Header v-if="isAuthenticated" />
+          <div class="main-content">
+            <router-view />
           </div>
-        </a-layout-footer>
-      </a-layout>
-      
-      <router-view v-else />
+          <Footer v-if="isAuthenticated" />
+        </template>
+      </template>
     </div>
   </a-config-provider>
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { Message } from '@arco-design/web-vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from './store/authStore';
+import Header from './components/Header.vue';
+import Footer from './components/Footer.vue';
 
-const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-const activeKey = ref(route.path);
-
-// 计算属性
 const isAuthenticated = computed(() => authStore.isAuthenticated);
-const isAdmin = computed(() => authStore.isAdmin);
-const isTeacher = computed(() => authStore.isTeacher);
-const isStudent = computed(() => authStore.isStudent);
-const userInfo = computed(() => authStore.currentUser || {});
-const userTypeText = computed(() => {
-  if (isAdmin.value) return '管理员';
-  if (isTeacher.value) return '教师';
-  if (isStudent.value) return '学生';
-  return '用户';
-});
+const isLoginPage = computed(() => route.name === 'Login');
+const loading = ref(true);
 
-// 监听路由变化，更新激活的菜单项
-watch(() => route.path, (newPath) => {
-  activeKey.value = newPath;
-});
-
-// 初始化认证状态
-onMounted(() => {
-  authStore.init();
-});
-
-const handleMenuClick = (key) => {
-  router.push(key);
-};
-
-const handleLogout = async () => {
+onMounted(async () => {
   try {
-    await authStore.logout();
-    Message.success('已退出登录');
-    router.push('/login');
+    await authStore.init();
+    if (authStore.token && !authStore.user) {
+      await authStore.fetchCurrentUser(false);
+    }
   } catch (error) {
-    Message.error('退出登录失败');
+    console.error('初始化认证状态失败', error);
+  } finally {
+    setTimeout(() => {
+      loading.value = false;
+    }, 300);
   }
-};
+});
 </script>
 
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
+<style scoped>
 .app-container {
   min-height: 100vh;
+  background-color: #f7f8fa;
 }
-
-.header-content {
+.main-content {
+  margin-top: 64px;
+  min-height: calc(100vh - 64px - 60px);
+  background-color: #f7f8fa;
+}
+.global-loading {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #165dff 0%, #4080ff 100%);
+}
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  color: white;
+}
+.loading-logo {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  color: #fff;
-  padding: 0 20px;
-  width: 100%;
+  justify-content: center;
+  font-size: 36px;
+  color: white;
+  backdrop-filter: blur(10px);
 }
-
-.logo {
-  font-size: 18px;
-  font-weight: bold;
-  margin-right: 40px;
-}
-
-.user-info {
-  margin-left: auto;
-  color: #fff;
-}
-
-.footer-content {
-  text-align: center;
-  color: #666;
-  padding: 20px 0;
+.loading-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
 }
 </style>
