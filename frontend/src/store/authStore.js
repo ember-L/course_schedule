@@ -3,7 +3,7 @@ import { authApi } from '@/api/auth';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user:JSON.parse(localStorage.getItem('user') || null),
+    user:localStorage.getItem('user') || null,
     token: localStorage.getItem('token') || null,
     userType: localStorage.getItem('userType') || null,
     loading: false
@@ -72,9 +72,9 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       try {
         let response;
-        
-        const userId =this.user.id;
-        console.log(userId);
+              console.log(this.user);  
+        const userId = JSON.parse(this.user).id;
+
         // 根据用户类型获取当前用户信息
         if (this.userType === 'admin') {
           response = await authApi.getAdminProfile(userId);

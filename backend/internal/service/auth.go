@@ -158,7 +158,7 @@ func (s *authService) StudentLogin(studentID, password string) (*model.LoginResp
 
 // GetStudentProfile 获取学生信息
 func (s *authService) GetStudentProfile(id uint) (*model.Student, error) {
-	student, err := s.authRepo.FindStudentByStudentID("")
+	student, err := s.authRepo.GetStudentById(id)
 	if err != nil {
 		return nil, err
 	}

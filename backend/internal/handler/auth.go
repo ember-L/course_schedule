@@ -25,14 +25,14 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 func (h *AuthHandler) Register(e *echo.Echo) {
 	// 管理员认证
 	e.POST("/admin/login", h.AdminLogin)
-	e.GET("/api/admin/profile", h.GetAdminProfile, h.AuthMiddleware("admin"))
+	e.GET("/api/admin/profile/:id", h.GetAdminProfile, h.AuthMiddleware("admin"))
 
 	e.POST("/teacher/login", h.TeacherLogin)
-	e.GET("/teacher/profile", h.GetTeacherProfile, h.AuthMiddleware("teacher"))
+	e.GET("/teacher/profile/:id", h.GetTeacherProfile, h.AuthMiddleware("teacher"))
 
 	// 学生认证
 	e.POST("/student/login", h.StudentLogin)
-	e.GET("/student/profile", h.GetStudentProfile, h.AuthMiddleware("student"))
+	e.GET("/student/profile/:id", h.GetStudentProfile, h.AuthMiddleware("student"))
 
 	// 通用认证
 	e.POST("/logout", h.Logout)

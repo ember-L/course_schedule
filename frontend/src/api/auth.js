@@ -18,13 +18,13 @@ export const authApi = {
   logout: () => api.post('/logout'),
   
   // 获取管理员信息
-  getAdminProfile: (id) => api.get('/admin/profile'),
+  getAdminProfile: (id) => api.get(`/admin/profile/${id}`),
   
   // 获取教师信息
-  getTeacherProfile: (id) => api.get('/teacher/profile'),
+  getTeacherProfile: (id) => api.get(`/teacher/profile/${id}`),
   
   // 获取学生信息
-  getStudentProfile: (id) => api.get('/student/profile'),
+  getStudentProfile: (id) => api.get(`/student/profile/${id}`),
   
   // 修改密码
   changePassword: (oldPassword, newPassword) => 

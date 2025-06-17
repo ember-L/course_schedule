@@ -97,7 +97,7 @@
 import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Message } from '@arco-design/web-vue';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 const router = useRouter();
 const route = useRoute();

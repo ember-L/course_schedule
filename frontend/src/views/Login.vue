@@ -157,7 +157,7 @@ const handleLogin = async () => {
     if (form.userType === 'admin') {
       router.push('/');
     } else if (form.userType === 'teacher') {
-      router.push('/sections');
+      router.push('/');
     } else {
       router.push('/schedule');
     }
