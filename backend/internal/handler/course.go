@@ -27,6 +27,8 @@ func (h *CourseHandler) Register(e *echo.Echo) {
 	e.POST("/courses", h.CreateCourse)
 	e.PUT("/courses/:id", h.UpdateCourse)
 	e.DELETE("/courses/:id", h.DeleteCourse)
+
+	e.GET("/courses/teacher/:teacherId", h.GetCoursesByTeacherID)
 }
 
 // GetAllCourses 获取所有课程
@@ -99,4 +101,18 @@ func (h *CourseHandler) DeleteCourse(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+
+// 根据教师ID获取课程
+func (h *CourseHandler) GetCoursesByTeacherID(c echo.Context) error {
+
+	teacherID, err := strconv.ParseUint(c.Param("teacherId"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid teacher ID"})
+	}
+	courses, err := h.courseService.GetByTeacherID(uint(teacherID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, courses)
 }

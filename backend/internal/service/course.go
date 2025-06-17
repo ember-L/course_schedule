@@ -12,6 +12,7 @@ type CourseService interface {
 	CreateCourse(course *model.Course) error
 	UpdateCourse(course *model.Course) error
 	DeleteCourse(id uint) error
+	GetByTeacherID(teacherID uint) ([]model.Course, error)
 }
 
 // courseService 课程服务实现
@@ -47,4 +48,9 @@ func (s *courseService) UpdateCourse(course *model.Course) error {
 // DeleteCourse 删除课程
 func (s *courseService) DeleteCourse(id uint) error {
 	return s.repo.Delete(id)
+}
+
+// 根据教师ID获取课程
+func (s *courseService) GetByTeacherID(teacherID uint) ([]model.Course, error) {
+	return s.repo.GetByTeacherID(teacherID)
 }

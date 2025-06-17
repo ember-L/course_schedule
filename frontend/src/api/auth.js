@@ -1,4 +1,4 @@
-import api from '@/api/index';
+import api from '@/api/index.js';
 
 // 认证相关API
 export const authApi = {
@@ -18,13 +18,13 @@ export const authApi = {
   logout: () => api.post('/logout'),
   
   // 获取管理员信息
-  getAdminProfile: () => api.get('/admin/profile'),
+  getAdminProfile: (id) => api.get('/admin/profile'),
   
   // 获取教师信息
-  getTeacherProfile: () => api.get('/teacher/profile'),
+  getTeacherProfile: (id) => api.get('/teacher/profile'),
   
   // 获取学生信息
-  getStudentProfile: () => api.get('/student/profile'),
+  getStudentProfile: (id) => api.get('/student/profile'),
   
   // 修改密码
   changePassword: (oldPassword, newPassword) => 

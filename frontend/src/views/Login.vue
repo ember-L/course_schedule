@@ -26,6 +26,7 @@
           :rules="rules" 
           layout="vertical"
           class="login-form"
+          @submit.prevent="handleLogin"
         >
           <a-form-item field="userType" label="用户类型">
             <a-radio-group v-model="form.userType" class="user-type-group">
@@ -81,7 +82,8 @@
               type="primary" 
               long 
               size="large"
-              @click="handleLogin" 
+              @click="handleLogin"
+
               :loading="loading"
               class="login-button"
             >
@@ -118,7 +120,7 @@
 import { ref, reactive } from 'vue';
 import { Message } from '@arco-design/web-vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -144,14 +146,14 @@ const rules = {
 
 const handleLogin = async () => {
   try {
-    // 先验证表单
+    // 验证表单
     await formRef.value.validate();
     
     loading.value = true;
     await authStore.login(form.userType, form.username, form.password);
     Message.success('登录成功');
     
-    // 根据用户类型跳转到不同页面
+    // 根据用户类型跳转
     if (form.userType === 'admin') {
       router.push('/');
     } else if (form.userType === 'teacher') {
@@ -160,17 +162,15 @@ const handleLogin = async () => {
       router.push('/schedule');
     }
   } catch (error) {
-    // 如果是表单验证错误，不显示错误消息
-    if (error && error.message && (error.message.includes('验证') || error.message.includes('required'))) {
-      return;
-    }
-    // 显示具体的错误信息
-    const errorMessage = error?.response?.data?.message || error?.message || '用户名或密码错误';
-    Message.error('登录失败：' + errorMessage);
+    console.error('登录错误:', error);
+    Message.error(`登录失败：用户名或密码错误`);
+    // 清空密码字段
+    form.password = '';
   } finally {
     loading.value = false;
   }
 };
+
 </script>
 
 <style scoped>

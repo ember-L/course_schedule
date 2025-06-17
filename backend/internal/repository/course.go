@@ -11,6 +11,9 @@ type CourseRepository interface {
 	Create(course *model.Course) error
 	Update(course *model.Course) error
 	Delete(id uint) error
+
+	//根据教师id 获取对应课程
+	GetByTeacherID(teacherID uint) ([]model.Course, error)
 }
 
 // courseRepository 课程仓库实现
@@ -38,6 +41,16 @@ func (r *courseRepository) GetByID(id uint) (*model.Course, error) {
 		return nil, result.Error
 	}
 	return &course, nil
+}
+
+// 根据教师id获取课程
+// select * from course where id in (select  from teacher_course where teacher_id = ?)
+func (r *courseRepository) GetByTeacherID(teacherID uint) ([]model.Course, error) {
+	var courses []model.Course
+	result := r.db.DB.Model(&model.Course{}).
+		Joins("JOIN teacher_courses ON teacher_courses.course_id = id").
+		Where("teacher_courses.teacher_id = ?", teacherID).Find(&courses)
+	return courses, result.Error
 }
 
 // Create 创建课程

@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
-import { authApi } from '../api/auth';
+import { authApi } from '@/api/auth';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: JSON.parse(localStorage.getItem('user') || 'null'),
+    user:JSON.parse(localStorage.getItem('user') || null),
     token: localStorage.getItem('token') || null,
     userType: localStorage.getItem('userType') || null,
     loading: false
@@ -41,7 +41,6 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('token', response.token);
         localStorage.setItem('userType', userType);
         localStorage.setItem('user', JSON.stringify(response.user));
-        
         return response;
       } finally {
         this.loading = false;
@@ -74,13 +73,15 @@ export const useAuthStore = defineStore('auth', {
       try {
         let response;
         
+        const userId =this.user.id;
+        console.log(userId);
         // 根据用户类型获取当前用户信息
         if (this.userType === 'admin') {
-          response = await authApi.getAdminProfile();
+          response = await authApi.getAdminProfile(userId);
         } else if (this.userType === 'teacher') {
-          response = await authApi.getTeacherProfile();
+          response = await authApi.getTeacherProfile(userId);
         } else {
-          response = await authApi.getStudentProfile();
+          response = await authApi.getStudentProfile(userId);
         }
         
         this.user = response.user;

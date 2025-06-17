@@ -254,7 +254,10 @@ onMounted(async () => {
 const fetchCourses = async () => {
   loading.value = true;
   try {
-    const data = await courseApi.getAll();
+    //
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log(user.id);
+    const data = await courseApi.getByTeacherId(user.id);
     courses.value = data;
   } catch (error) {
     Message.error('获取课程列表失败');

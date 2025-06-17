@@ -6,7 +6,8 @@ export const courseApi = {
   getById: (id) => api.get(`/courses/${id}`),
   create: (data) => api.post('/courses', data),
   update: (id, data) => api.put(`/courses/${id}`, data),
-  delete: (id) => api.delete(`/courses/${id}`)
+  delete: (id) => api.delete(`/courses/${id}`),
+  getByTeacherId: (id) => api.get(`/courses/teacher/${id}`),
 };
 
 // 教师相关API
@@ -29,11 +30,11 @@ export const classroomApi = {
 
 // 时间段相关API
 export const timeSlotApi = {
-  getAll: () => api.get('/time-slots'),
-  getById: (id) => api.get(`/time-slots/${id}`),
-  create: (data) => api.post('/time-slots', data),
-  update: (id, data) => api.put(`/time-slots/${id}`, data),
-  delete: (id) => api.delete(`/time-slots/${id}`)
+  getAll: () => api.get('/timeSlots'),
+  getById: (id) => api.get(`/timeSlots/${id}`),
+  create: (data) => api.post('/timeSlots', data),
+  update: (id, data) => api.put(`/timSlots/${id}`, data),
+  delete: (id) => api.delete(`/timeSlots/${id}`)
 };
 
 // 排课相关API

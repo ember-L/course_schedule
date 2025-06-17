@@ -12,15 +12,18 @@ import (
 type AuthRepository interface {
 	// 管理员认证
 	FindAdminByUsername(username string) (*model.AdminAuth, error)
+	GetAdminById(id uint) (*model.AdminAuth, error)
 	CreateAdmin(admin *model.AdminAuth) error
 	UpdateAdminPassword(id uint, hashedPassword string) error
 
 	// 教师认证
 	FindTeacherByEmail(email string) (*model.Teacher, error)
+	GetTeacherById(id uint) (*model.Teacher, error)
 	UpdateTeacherPassword(id uint, hashedPassword string) error
 
 	// 学生认证
 	FindStudentByStudentID(studentID string) (*model.Student, error)
+	GetStudentById(id uint) (*model.Student, error)
 	UpdateStudentPassword(id uint, hashedPassword string) error
 }
 
@@ -38,6 +41,18 @@ func NewAuthRepository(db *Database) AuthRepository {
 func (r *authRepository) FindAdminByUsername(username string) (*model.AdminAuth, error) {
 	var admin model.AdminAuth
 	result := r.db.DB.Where("username = ?", username).First(&admin)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &admin, nil
+}
+
+func (r *authRepository) GetAdminById(id uint) (*model.AdminAuth, error) {
+	var admin model.AdminAuth
+	result := r.db.DB.Where("id = ?", id).First(&admin)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -70,6 +85,18 @@ func (r *authRepository) FindTeacherByEmail(email string) (*model.Teacher, error
 	return &teacher, nil
 }
 
+func (r *authRepository) GetTeacherById(id uint) (*model.Teacher, error) {
+	var teacher model.Teacher
+	result := r.db.DB.Where("id = ?", id).First(&teacher)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &teacher, nil
+}
+
 // UpdateTeacherPassword 更新教师密码
 func (r *authRepository) UpdateTeacherPassword(id uint, hashedPassword string) error {
 	return r.db.DB.Model(&model.Teacher{}).Where("id = ?", id).Update("password", hashedPassword).Error
@@ -79,6 +106,18 @@ func (r *authRepository) UpdateTeacherPassword(id uint, hashedPassword string) e
 func (r *authRepository) FindStudentByStudentID(studentID string) (*model.Student, error) {
 	var student model.Student
 	result := r.db.DB.Where("student_id = ?", studentID).First(&student)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &student, nil
+}
+
+func (r *authRepository) GetStudentById(id uint) (*model.Student, error) {
+	var student model.Student
+	result := r.db.DB.Where("id = ?", id).First(&student)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil

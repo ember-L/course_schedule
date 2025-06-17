@@ -56,7 +56,7 @@ func (s *authService) AdminLogin(username, password string) (*model.LoginRespons
 	if admin == nil {
 		return nil, errors.New("用户名或密码错误")
 	}
-	hashedPassword, err := repository.HashPassword(password)
+	hashedPassword, _ := repository.HashPassword(password)
 	fmt.Println("admin:", admin.Password, "password:", hashedPassword)
 	// 验证密码
 	if !repository.CheckPasswordHash(password, admin.Password) {
@@ -78,7 +78,7 @@ func (s *authService) AdminLogin(username, password string) (*model.LoginRespons
 
 // GetAdminProfile 获取管理员信息
 func (s *authService) GetAdminProfile(id uint) (*model.AdminAuth, error) {
-	admin, err := s.authRepo.FindAdminByUsername("")
+	admin, err := s.authRepo.GetAdminById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (s *authService) TeacherLogin(email, password string) (*model.LoginResponse
 
 // GetTeacherProfile 获取教师信息
 func (s *authService) GetTeacherProfile(id uint) (*model.Teacher, error) {
-	teacher, err := s.authRepo.FindTeacherByEmail("")
+	teacher, err := s.authRepo.GetTeacherById(id)
 	if err != nil {
 		return nil, err
 	}
