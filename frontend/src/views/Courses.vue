@@ -255,10 +255,15 @@ const fetchCourses = async () => {
   loading.value = true;
   try {
     //
-    const user = JSON.parse(localStorage.getItem('user'));
-    console.log(user.id);
-    const data = await courseApi.getByTeacherId(user.id);
-    courses.value = data;
+    if(localStorage.getItem('userType') == "teacher"){
+      const user = JSON.parse(localStorage.getItem('user'));
+      console.log(user.id);
+      const data = await courseApi.getByTeacherId(user.id);
+      courses.value = data;
+    } else if (localStorage.getItem('userType') == "admin") {
+      const data = await courseApi.getAll();
+      courses.value = data;
+    }
   } catch (error) {
     Message.error('获取课程列表失败');
     console.error(error);

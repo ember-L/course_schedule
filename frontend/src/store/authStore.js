@@ -1,9 +1,21 @@
 import { defineStore } from 'pinia';
 import { authApi } from '@/api/auth';
 
+// 安全解析 localStorage
+const safeParse = (key, defaultValue = null) => {
+  try {
+    const item = localStorage.getItem(key);
+    console.log(`解析 ${key}`, item);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (error) {
+    console.error(`解析 ${key} 失败`, error);
+    return defaultValue;
+  }
+};
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user:localStorage.getItem('user') || null,
+    user: safeParse('user'), 
     token: localStorage.getItem('token') || null,
     userType: localStorage.getItem('userType') || null,
     loading: false
@@ -72,9 +84,13 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       try {
         let response;
-              console.log(this.user);  
-        const userId = JSON.parse(this.user).id;
+         // 确保用户 ID 存在
+        if (!this.user?.id) {
+          throw new Error('用户 ID 不存在');
+        }
 
+        const userId = this.user.id;
+        console.log('获取当前用户信息', userId);
         // 根据用户类型获取当前用户信息
         if (this.userType === 'admin') {
           response = await authApi.getAdminProfile(userId);
@@ -84,8 +100,12 @@ export const useAuthStore = defineStore('auth', {
           response = await authApi.getStudentProfile(userId);
         }
         
-        this.user = response.user;
-        localStorage.setItem('user', JSON.stringify(response.user));
+        // 更新用户信息
+        if (response?.user) {
+          this.user = response.user;
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+
         return response;
       } catch (error) {
         console.error('获取用户信息失败', error);
@@ -104,14 +124,7 @@ export const useAuthStore = defineStore('auth', {
       if (this.token) {
         // 优先用本地 user 信息
         if (!this.user) {
-          const localUser = localStorage.getItem('user');
-          if (localUser) {
-            try {
-              this.user = JSON.parse(localUser);
-            } catch (error) {
-              console.error('解析本地用户信息失败', error);
-            }
-          }
+          this.user = safeParse('user');
         }
         
         // 异步拉取最新用户信息，但不影响初始化状态
