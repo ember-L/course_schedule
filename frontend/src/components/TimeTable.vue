@@ -69,7 +69,7 @@ const processedColumns = computed(() => {
     {
       title: '时间/星期',
       dataIndex: 'time',
-      width: 100,
+      width: 120,
       fixed: 'left',
       slotName: 'time'
     },

@@ -39,7 +39,7 @@
             <icon-calendar />
             <span>排课管理</span>
           </a-menu-item>
-          <a-menu-item key="/students" v-if="isAdmin || isTeacher" class="menu-item">
+          <a-menu-item key="/students" v-if="isAdmin" class="menu-item">
             <icon-user-group />
             <span>学生管理</span>
           </a-menu-item>

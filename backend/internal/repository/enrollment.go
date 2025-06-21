@@ -2,6 +2,7 @@ package repository
 
 import (
 	"course_schedule/internal/model"
+	"fmt"
 )
 
 // EnrollmentRepository 选课记录仓库接口
@@ -70,7 +71,8 @@ func (r *enrollmentRepository) Create(enrollment *model.Enrollment) error {
 
 // Update 更新选课记录
 func (r *enrollmentRepository) Update(enrollment *model.Enrollment) error {
-	return r.db.DB.Save(enrollment).Error
+	fmt.Printf("Updating enrollment:%v", *enrollment)
+	return r.db.DB.Model(&enrollment).Update("grade", enrollment.Grade).Error
 }
 
 // Delete 删除选课记录
@@ -84,6 +86,6 @@ func (r *enrollmentRepository) CheckEnrollment(studentID, sectionID uint) (bool,
 	err := r.db.DB.Model(&model.Enrollment{}).
 		Where("student_id = ? AND section_id = ?", studentID, sectionID).
 		Count(&count).Error
-	
+
 	return count > 0, err
 }

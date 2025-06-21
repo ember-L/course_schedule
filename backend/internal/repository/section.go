@@ -11,6 +11,8 @@ import (
 type SectionRepository interface {
 	GetAll() ([]model.Section, error)
 	GetByID(id uint) (*model.Section, error)
+	GetByTeacher(teacherId uint) ([]model.Section, error)
+	GetByStudent(studentId uint) ([]model.Section, error)
 	Create(section *model.Section) error
 	Update(section *model.Section) error
 	Delete(id uint) error
@@ -57,6 +59,36 @@ func (r *sectionRepository) GetByID(id uint) (*model.Section, error) {
 	return &section, nil
 }
 
+// GetByTeacher 获取指定教师的课程安排
+func (r *sectionRepository) GetByTeacher(teacherId uint) ([]model.Section, error) {
+	var sections []model.Section
+	result := r.db.DB.
+		Preload("Course").
+		Preload("Teacher").
+		Preload("Classroom").
+		Preload("TimeSlot").
+		Where("teacher_id = ?", teacherId).
+		Find(&sections)
+	return sections, result.Error
+}
+
+// GetByStudent 获取指定学生的课程安排
+func (r *sectionRepository) GetByStudent(studentId uint) ([]model.Section, error) {
+	var sections []model.Section
+
+	// 通过选课记录获取学生的课程安排
+	result := r.db.DB.
+		Preload("Course").
+		Preload("Teacher").
+		Preload("Classroom").
+		Preload("TimeSlot").
+		Joins("JOIN enrollment ON section.id = enrollment.section_id").
+		Where("enrollment.student_id = ?", studentId).
+		Find(&sections)
+
+	return sections, result.Error
+}
+
 // Create 创建课程安排
 func (r *sectionRepository) Create(section *model.Section) error {
 	// 先检查冲突
@@ -94,12 +126,12 @@ func (r *sectionRepository) CheckConflict(section *model.Section) (bool, string,
 	var teacherConflict model.Section
 	teacherQuery := r.db.DB.Where("teacher_id = ? AND time_slot_id = ? AND semester = ?",
 		section.TeacherID, section.TimeSlotID, section.Semester)
-	
+
 	// 如果是更新操作，排除自身
 	if section.ID != 0 {
 		teacherQuery = teacherQuery.Where("id != ?", section.ID)
 	}
-	
+
 	result := teacherQuery.First(&teacherConflict)
 	if result.Error == nil {
 		// 找到冲突
@@ -108,17 +140,17 @@ func (r *sectionRepository) CheckConflict(section *model.Section) (bool, string,
 		// 查询出错
 		return false, "", result.Error
 	}
-	
+
 	// 检查教室时间冲突
 	var classroomConflict model.Section
 	classroomQuery := r.db.DB.Where("classroom_id = ? AND time_slot_id = ? AND semester = ?",
 		section.ClassroomID, section.TimeSlotID, section.Semester)
-	
+
 	// 如果是更新操作，排除自身
 	if section.ID != 0 {
 		classroomQuery = classroomQuery.Where("id != ?", section.ID)
 	}
-	
+
 	result = classroomQuery.First(&classroomConflict)
 	if result.Error == nil {
 		// 找到冲突
@@ -127,7 +159,7 @@ func (r *sectionRepository) CheckConflict(section *model.Section) (bool, string,
 		// 查询出错
 		return false, "", result.Error
 	}
-	
+
 	// 没有冲突
 	return false, "", nil
 }

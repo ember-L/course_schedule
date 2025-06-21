@@ -118,8 +118,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useAuthStore } from '../store/authStore';
-import axios from 'axios';
+import { useAuthStore } from '@/store/authStore';
+import {scheduleApi} from '@/api/modules.js'
+
 
 const authStore = useAuthStore();
 const userInfo = computed(() => authStore.currentUser || {});
@@ -127,7 +128,10 @@ const loading = ref(true);
 const todayClasses = ref([]);
 const currentSemester = ref('2023-2024-2');
 const currentWeek = ref(12);
-
+// 计算属性
+const isAdmin = computed(() => authStore.isAdmin);
+const isTeacher = computed(() => authStore.isTeacher);
+const isStudent = computed(() => authStore.isStudent);
 // 日期相关
 const now = new Date();
 const formattedDate = computed(() => {
@@ -161,47 +165,26 @@ const announcements = ref([
 const fetchTodaySchedule = async () => {
   loading.value = true;
   try {
-    // 实际应用中应调用API
-    // const response = await axios.get('/api/schedule/today');
-    // todayClasses.value = response.data;
-    
-    // 模拟数据
-    setTimeout(() => {
-      const dayIndex = now.getDay();
-      if (dayIndex === 0 || dayIndex === 6) {
-        todayClasses.value = [];
+    if(!isAdmin.value){
+      const response = await scheduleApi.getTodaySchedule();
+      // 兼容后端返回 Section 结构
+      if (Array.isArray(response)) {
+        todayClasses.value = response.map(section => ({
+          id: section.id,
+          courseName: section.course?.name || '未知课程',
+          teacherName: section.teacher?.name || '未知教师',
+          classroom: (section.classroom?.building || '') + (section.classroom?.room || ''),
+          startTime: section.timeSlot?.startTime || '',
+          endTime: section.timeSlot?.endTime || ''
+        }));
       } else {
-        todayClasses.value = [
-          {
-            id: 1,
-            courseName: '高等数学',
-            teacherName: '张教授',
-            classroom: '教学楼A-101',
-            startTime: '08:00',
-            endTime: '09:40'
-          },
-          {
-            id: 2,
-            courseName: '数据结构',
-            teacherName: '李副教授',
-            classroom: '教学楼B-203',
-            startTime: '10:00',
-            endTime: '11:40'
-          },
-          {
-            id: 3,
-            courseName: '计算机网络',
-            teacherName: '王讲师',
-            classroom: '实验楼C-305',
-            startTime: '14:00',
-            endTime: '15:40'
-          }
-        ];
+        todayClasses.value = [];
       }
-      loading.value = false;
-    }, 500);
+    }
   } catch (error) {
     console.error('获取今日课表失败:', error);
+    todayClasses.value = [];
+  } finally {
     loading.value = false;
   }
 };

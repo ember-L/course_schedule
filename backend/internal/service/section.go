@@ -9,6 +9,8 @@ import (
 type SectionService interface {
 	GetAll() ([]model.Section, error)
 	GetByID(id uint) (*model.Section, error)
+	GetByTeacher(teacherId uint) ([]model.Section, error)
+	GetByStudent(studentId uint) ([]model.Section, error)
 	Create(section *model.Section) error
 	Update(section *model.Section) error
 	Delete(id uint) error
@@ -35,6 +37,16 @@ func (s *sectionService) GetAll() ([]model.Section, error) {
 // GetByID 通过ID获取课程安排
 func (s *sectionService) GetByID(id uint) (*model.Section, error) {
 	return s.sectionRepo.GetByID(id)
+}
+
+// GetByTeacher 获取指定教师的课程安排
+func (s *sectionService) GetByTeacher(teacherId uint) ([]model.Section, error) {
+	return s.sectionRepo.GetByTeacher(teacherId)
+}
+
+// GetByStudent 获取指定学生的课程安排
+func (s *sectionService) GetByStudent(studentId uint) ([]model.Section, error) {
+	return s.sectionRepo.GetByStudent(studentId)
 }
 
 // Create 创建课程安排

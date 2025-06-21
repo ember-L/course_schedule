@@ -13,20 +13,33 @@ import (
 // ClassroomHandler 教室处理器
 type ClassroomHandler struct {
 	classroomService service.ClassroomService
+	authService      service.AuthService
 }
 
 // NewClassroomHandler 创建教室处理器
-func NewClassroomHandler(classroomService service.ClassroomService) *ClassroomHandler {
-	return &ClassroomHandler{classroomService: classroomService}
+func NewClassroomHandler(classroomService service.ClassroomService, authService service.AuthService) *ClassroomHandler {
+	return &ClassroomHandler{
+		classroomService: classroomService,
+		authService:      authService,
+	}
 }
 
 // Register 注册路由
 func (h *ClassroomHandler) Register(e *echo.Echo) {
+	// 公开路由 - 所有用户都可以查看教室信息
 	e.GET("/classrooms", h.GetAllClassrooms)
 	e.GET("/classrooms/:id", h.GetClassroomByID)
-	e.POST("/classrooms", h.CreateClassroom)
-	e.PUT("/classrooms/:id", h.UpdateClassroom)
-	e.DELETE("/classrooms/:id", h.DeleteClassroom)
+
+	// 需要认证的路由
+	authGroup := e.Group("")
+	authGroup.Use(AuthMiddleware(h.authService))
+
+	// 管理员可以管理的路由
+	adminGroup := authGroup.Group("/classrooms")
+	adminGroup.Use(RoleMiddleware("admin"))
+	adminGroup.POST("", h.CreateClassroom)
+	adminGroup.PUT("/:id", h.UpdateClassroom)
+	adminGroup.DELETE("/:id", h.DeleteClassroom)
 }
 
 // GetAllClassrooms 获取所有教室

@@ -3,7 +3,6 @@ package handler
 import (
 	"course_schedule/internal/model"
 	"course_schedule/internal/service"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -23,26 +22,38 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 
 // Register 注册路由
 func (h *AuthHandler) Register(e *echo.Echo) {
-	// 管理员认证
+	// 公开路由 - 无需认证
 	e.POST("/admin/login", h.AdminLogin)
-	e.GET("/api/admin/profile/:id", h.GetAdminProfile, h.AuthMiddleware("admin"))
-
 	e.POST("/teacher/login", h.TeacherLogin)
-	e.GET("/teacher/profile/:id", h.GetTeacherProfile, h.AuthMiddleware("teacher"))
-
-	// 学生认证
 	e.POST("/student/login", h.StudentLogin)
-	e.GET("/student/profile/:id", h.GetStudentProfile, h.AuthMiddleware("student"))
-
-	// 通用认证
 	e.POST("/logout", h.Logout)
-	e.POST("/change-password", h.ChangePassword, h.AuthMiddleware(""))
+
+	// 需要认证的路由
+	authGroup := e.Group("")
+	authGroup.Use(AuthMiddleware(h.authService))
+
+	// 管理员路由
+	adminGroup := authGroup.Group("/admin")
+	adminGroup.Use(RoleMiddleware("admin"))
+	adminGroup.GET("/profile/:id", h.GetAdminProfile)
+
+	// 教师路由
+	teacherGroup := authGroup.Group("/teacher")
+	teacherGroup.Use(RoleMiddleware("teacher"))
+	teacherGroup.GET("/profile/:id", h.GetTeacherProfile)
+
+	// 学生路由
+	studentGroup := authGroup.Group("/student")
+	studentGroup.Use(RoleMiddleware("student"))
+	studentGroup.GET("/profile/:id", h.GetStudentProfile)
+
+	// 通用路由 - 所有认证用户都可以访问
+	authGroup.POST("/change-password", h.ChangePassword)
 }
 
 // AdminLogin 管理员登录
 func (h *AuthHandler) AdminLogin(c echo.Context) error {
 	var req model.LoginRequest
-	fmt.Println(req)
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "无效的请求参数"})
 	}
@@ -184,58 +195,4 @@ func (h *AuthHandler) ChangePassword(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "密码修改成功"})
-}
-
-// AuthMiddleware 认证中间件
-func (h *AuthHandler) AuthMiddleware(requiredRole string) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			// 从请求头中获取令牌
-			tokenString := c.Request().Header.Get("Authorization")
-			if tokenString == "" {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "未提供认证令牌"})
-			}
-
-			// 去掉Bearer前缀
-			if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
-				tokenString = tokenString[7:]
-			}
-
-			// 验证令牌
-			claims, err := h.authService.ValidateToken(tokenString)
-			if err != nil {
-				return c.JSON(http.StatusUnauthorized, map[string]string{"error": "无效的认证令牌"})
-			}
-
-			// 检查角色
-			if requiredRole != "" && claims.UserType != requiredRole {
-				return c.JSON(http.StatusForbidden, map[string]string{"error": "权限不足"})
-			}
-
-			// 将用户信息存储到上下文中
-			c.Set("userID", claims.UserID)
-			c.Set("username", claims.Username)
-			c.Set("userType", claims.UserType)
-
-			return next(c)
-		}
-	}
-}
-
-// getUserIDFromContext 从上下文中获取用户ID
-func getUserIDFromContext(c echo.Context) uint {
-	userID, ok := c.Get("userID").(uint)
-	if !ok {
-		return 0
-	}
-	return userID
-}
-
-// getUserTypeFromContext 从上下文中获取用户类型
-func getUserTypeFromContext(c echo.Context) string {
-	userType, ok := c.Get("userType").(string)
-	if !ok {
-		return ""
-	}
-	return userType
 }

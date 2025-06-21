@@ -30,6 +30,8 @@ func (h *SectionHandler) Register(e *echo.Echo) {
 	sections.PUT("/:id", h.Update)
 	sections.DELETE("/:id", h.Delete)
 	sections.POST("/check-conflict", h.CheckConflict)
+	sections.GET("/teacher/:teacherId", h.GetByTeacher)
+	sections.GET("/student/:studentId", h.GetByStudent)
 }
 
 // GetAll 获取所有课程安排
@@ -58,6 +60,36 @@ func (h *SectionHandler) GetByID(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, section)
+}
+
+// GetByTeacher 获取指定教师的课程安排
+func (h *SectionHandler) GetByTeacher(c echo.Context) error {
+	teacherId, err := strconv.ParseUint(c.Param("teacherId"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "无效的教师ID"})
+	}
+
+	sections, err := h.sectionService.GetByTeacher(uint(teacherId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, sections)
+}
+
+// GetByStudent 获取指定学生的课程安排
+func (h *SectionHandler) GetByStudent(c echo.Context) error {
+	studentId, err := strconv.ParseUint(c.Param("studentId"), 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "无效的学生ID"})
+	}
+
+	sections, err := h.sectionService.GetByStudent(uint(studentId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, sections)
 }
 
 // Create 创建课程安排

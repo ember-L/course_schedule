@@ -71,16 +71,18 @@ func main() {
 	studentService := service.NewStudentService(studentRepo)
 	enrollmentService := service.NewEnrollmentService(enrollmentRepo, sectionRepo)
 	authService := service.NewAuthService(authRepo, cfg.Auth.JWTSecret, cfg.Auth.JWTDuration)
+	scheduleService := service.NewScheduleService(sectionService)
 
 	// 初始化处理器
-	courseHandler := handler.NewCourseHandler(courseService)
-	teacherHandler := handler.NewTeacherHandler(teacherService)
-	classroomHandler := handler.NewClassroomHandler(classroomService)
+	courseHandler := handler.NewCourseHandler(courseService, authService)
+	teacherHandler := handler.NewTeacherHandler(teacherService, authService)
+	classroomHandler := handler.NewClassroomHandler(classroomService, authService)
 	timeSlotHandler := handler.NewTimeSlotHandler(timeSlotService)
 	sectionHandler := handler.NewSectionHandler(sectionService)
 	studentHandler := handler.NewStudentHandler(studentService)
 	enrollmentHandler := handler.NewEnrollmentHandler(enrollmentService)
 	authHandler := handler.NewAuthHandler(authService)
+	scheduleHandler := handler.NewScheduleHandler(scheduleService, authService)
 
 	// 创建Echo实例
 	e := echo.New()
@@ -98,6 +100,7 @@ func main() {
 	studentHandler.Register(e)
 	enrollmentHandler.Register(e)
 	authHandler.Register(e)
+	scheduleHandler.Register(e)
 
 	// 启动服务器
 	serverAddr := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
