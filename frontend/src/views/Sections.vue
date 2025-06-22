@@ -252,38 +252,38 @@ const showEditModal = (record) => {
 };
 
 const handleModalOk = async () => {
-  formRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        // 先检查冲突
-        const checkResult = await sectionApi.checkConflict({
-          id: form.id, // 如果是编辑，需要排除自身
-          teacherId: form.teacherId,
-          classroomId: form.classroomId,
-          timeSlotId: form.timeSlotId,
-          semester: form.semester
-        });
-        
-        if (checkResult.hasConflict) {
-          Message.error(`排课冲突: ${checkResult.message}`);
-          return;
-        }
-        
-        if (isEdit.value) {
-          await sectionApi.update(form.id, form);
-          Message.success('更新排课成功');
-        } else {
-          await sectionApi.create(form);
-          Message.success('添加排课成功');
-        }
-        modalVisible.value = false;
-        await fetchAllData();
-      } catch (error) {
-        Message.error(isEdit.value ? '更新排课失败' : '添加排课失败');
-        console.error(error);
-      }
+  // formRef.value.validate(async (valid) => {
+  //   if (valid) {
+  try {
+    // 先检查冲突
+    const checkResult = await sectionApi.checkConflict({
+      id: form.id, // 如果是编辑，需要排除自身
+      teacherId: form.teacherId,
+      classroomId: form.classroomId,
+      timeSlotId: form.timeSlotId,
+      semester: form.semester
+    });
+    
+    if (checkResult.hasConflict) {
+      Message.error(`排课冲突: ${checkResult.message}`);
+      return;
     }
-  });
+    
+    if (isEdit.value) {
+      await sectionApi.update(form.id, form);
+      Message.success('更新排课成功');
+    } else {
+      await sectionApi.create(form);
+      Message.success('添加排课成功');
+    }
+    modalVisible.value = false;
+    await fetchAllData();
+  } catch (error) {
+    Message.error(isEdit.value ? '更新排课失败' : '添加排课失败');
+    console.error(error);
+  }
+  //   }
+  // });
 };
 
 const deleteSection = async (id) => {

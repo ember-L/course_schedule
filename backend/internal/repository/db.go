@@ -37,10 +37,10 @@ func NewDatabase(username, password, host, port, dbname, charset string) (*Datab
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// 设置最大空闲连接数
 	sqlDB.SetMaxIdleConns(10)
-	
+
 	// 设置最大打开连接数
 	sqlDB.SetMaxOpenConns(100)
 
@@ -69,7 +69,7 @@ func (d *Database) AutoMigrate() error {
 	d.DB.Model(&model.AdminAuth{}).Count(&count)
 	if count == 0 {
 		// 创建默认管理员账号
-		hashedPassword, err := HashPassword("admin123")
+		hashedPassword, err := HashPassword("123456")
 		if err != nil {
 			return err
 		}
@@ -118,6 +118,11 @@ func (d *Database) AutoMigrate() error {
 			{DayOfWeek: 5, StartTime: "14:00", EndTime: "15:40"}, // 周五第5-6节
 			{DayOfWeek: 5, StartTime: "16:00", EndTime: "17:40"}, // 周五第7-8节
 			{DayOfWeek: 5, StartTime: "19:00", EndTime: "20:40"}, // 周五第9-10节
+			{DayOfWeek: 6, StartTime: "08:00", EndTime: "09:40"}, // 周六第1-2节
+			{DayOfWeek: 6, StartTime: "10:00", EndTime: "11:40"}, // 周六第3-4节
+			{DayOfWeek: 6, StartTime: "14:00", EndTime: "15:40"}, // 周六第5-6节
+			{DayOfWeek: 6, StartTime: "16:00", EndTime: "17:40"}, // 周六第7-8节
+			{DayOfWeek: 6, StartTime: "19:00", EndTime: "20:40"}, // 周六第9-10节
 		}
 
 		for _, ts := range timeSlots {

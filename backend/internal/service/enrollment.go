@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"time"
-	
+
 	"course_schedule/internal/model"
 	"course_schedule/internal/repository"
 )
@@ -14,6 +14,9 @@ type EnrollmentService interface {
 	GetEnrollmentByID(id uint) (*model.Enrollment, error)
 	GetEnrollmentsByStudentID(studentID uint) ([]model.Enrollment, error)
 	GetEnrollmentsBySectionID(sectionID uint) ([]model.Enrollment, error)
+	GetEnrollmentsByTeacherID(teacherID uint) ([]model.Enrollment, error)
+	GetEnrollmentsByTeacherAndSection(teacherID, sectionID uint) ([]model.Enrollment, error)
+	IsTeacherCourse(teacherID, sectionID uint) (bool, error)
 	EnrollCourse(studentID, sectionID uint) error
 	UpdateEnrollment(enrollment *model.Enrollment) error
 	DeleteEnrollment(id uint) error
@@ -21,14 +24,14 @@ type EnrollmentService interface {
 
 // enrollmentService 选课服务实现
 type enrollmentService struct {
-	enrollRepo repository.EnrollmentRepository
+	enrollRepo  repository.EnrollmentRepository
 	sectionRepo repository.SectionRepository
 }
 
 // NewEnrollmentService 创建选课服务
 func NewEnrollmentService(enrollRepo repository.EnrollmentRepository, sectionRepo repository.SectionRepository) EnrollmentService {
 	return &enrollmentService{
-		enrollRepo: enrollRepo,
+		enrollRepo:  enrollRepo,
 		sectionRepo: sectionRepo,
 	}
 }
@@ -53,6 +56,21 @@ func (s *enrollmentService) GetEnrollmentsBySectionID(sectionID uint) ([]model.E
 	return s.enrollRepo.GetBySectionID(sectionID)
 }
 
+// GetEnrollmentsByTeacherID 根据教师ID获取该教师所有课程的选课记录
+func (s *enrollmentService) GetEnrollmentsByTeacherID(teacherID uint) ([]model.Enrollment, error) {
+	return s.enrollRepo.GetByTeacherID(teacherID)
+}
+
+// GetEnrollmentsByTeacherAndSection 根据教师ID和课程安排ID获取选课记录
+func (s *enrollmentService) GetEnrollmentsByTeacherAndSection(teacherID, sectionID uint) ([]model.Enrollment, error) {
+	return s.enrollRepo.GetByTeacherAndSection(teacherID, sectionID)
+}
+
+// IsTeacherCourse 检查课程是否属于指定教师
+func (s *enrollmentService) IsTeacherCourse(teacherID, sectionID uint) (bool, error) {
+	return s.enrollRepo.IsTeacherCourse(teacherID, sectionID)
+}
+
 // EnrollCourse 学生选课
 func (s *enrollmentService) EnrollCourse(studentID, sectionID uint) error {
 	// 检查是否已选过该课程
@@ -63,29 +81,29 @@ func (s *enrollmentService) EnrollCourse(studentID, sectionID uint) error {
 	if exists {
 		return errors.New("已经选过该课程")
 	}
-	
+
 	// 检查课程是否已满
 	section, err := s.sectionRepo.GetByID(sectionID)
 	if err != nil {
 		return err
 	}
-	
+
 	enrollments, err := s.enrollRepo.GetBySectionID(sectionID)
 	if err != nil {
 		return err
 	}
-	
+
 	if len(enrollments) >= section.MaxStudents {
 		return errors.New("课程已满")
 	}
-	
+
 	// 创建选课记录
 	enrollment := &model.Enrollment{
 		StudentID:  studentID,
 		SectionID:  sectionID,
 		EnrollTime: time.Now(),
 	}
-	
+
 	return s.enrollRepo.Create(enrollment)
 }
 

@@ -7,8 +7,8 @@
           <h1 class="page-title">课程管理</h1>
           <p class="page-subtitle">管理系统中的所有课程信息</p>
         </div>
-        <div class="header-right">
-          <a-button type="primary" @click="showAddModal" class="add-button">
+        <div class="header-right" >
+          <a-button v-if="isAdmin" type="primary" @click="showAddModal" class="add-button">
             <icon-plus />
             添加课程
           </a-button>
@@ -69,7 +69,7 @@
         class="courses-table"
       >
         <template #operations="{ record }">
-          <div class="action-buttons">
+          <div class="action-buttons" v-if="isAdmin">
             <a-button 
               type="text" 
               size="small"
@@ -80,6 +80,7 @@
               编辑
             </a-button>
             <a-popconfirm
+            
               content="确定要删除这个课程吗？"
               @ok="deleteCourse(record.id)"
             >
@@ -168,14 +169,20 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { Message } from '@arco-design/web-vue';
-import { courseApi } from '../api/modules';
+import { courseApi } from '@/api/modules';
+import { useAuthStore } from '@/store/authStore';
 
+const authStore = useAuthStore();
 const loading = ref(false);
 const courses = ref([]);
 const modalVisible = ref(false);
 const isEdit = ref(false);
 const formRef = ref(null);
 const searchKeyword = ref('');
+// 计算属性
+const isAdmin = computed(() => authStore.isAdmin);
+const isTeacher = computed(() => authStore.isTeacher);
+const isStudent = computed(() => authStore.isStudent);
 
 const form = reactive({
   id: null,
@@ -293,8 +300,8 @@ const showEditModal = (record) => {
 };
 
 const handleModalOk = async () => {
-  formRef.value.validate(async (valid) => {
-    if (valid) {
+  // formRef.value.validate(async (valid) => {
+  //   if (valid) {
       try {
         if (isEdit.value) {
           await courseApi.update(form.id, form);
@@ -309,8 +316,8 @@ const handleModalOk = async () => {
         Message.error(isEdit.value ? '更新课程失败' : '添加课程失败');
         console.error(error);
       }
-    }
-  });
+  //   }
+  // });
 };
 
 const deleteCourse = async (id) => {

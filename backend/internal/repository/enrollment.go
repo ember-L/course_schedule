@@ -11,6 +11,9 @@ type EnrollmentRepository interface {
 	GetByID(id uint) (*model.Enrollment, error)
 	GetByStudentID(studentID uint) ([]model.Enrollment, error)
 	GetBySectionID(sectionID uint) ([]model.Enrollment, error)
+	GetByTeacherID(teacherID uint) ([]model.Enrollment, error)
+	GetByTeacherAndSection(teacherID, sectionID uint) ([]model.Enrollment, error)
+	IsTeacherCourse(teacherID, sectionID uint) (bool, error)
 	Create(enrollment *model.Enrollment) error
 	Update(enrollment *model.Enrollment) error
 	Delete(id uint) error
@@ -62,6 +65,42 @@ func (r *enrollmentRepository) GetBySectionID(sectionID uint) ([]model.Enrollmen
 		Preload("Student").Preload("Section").
 		Find(&enrollments)
 	return enrollments, result.Error
+}
+
+// GetByTeacherID 根据教师ID获取该教师所有课程的选课记录
+func (r *enrollmentRepository) GetByTeacherID(teacherID uint) ([]model.Enrollment, error) {
+	var enrollments []model.Enrollment
+	result := r.db.DB.
+		Joins("JOIN section ON enrollment.section_id = section.id").
+		Where("section.teacher_id = ?", teacherID).
+		Preload("Student").Preload("Section").
+		Preload("Section.Course").Preload("Section.Teacher").
+		Preload("Section.Classroom").Preload("Section.TimeSlot").
+		Find(&enrollments)
+	return enrollments, result.Error
+}
+
+// GetByTeacherAndSection 根据教师ID和课程安排ID获取选课记录
+func (r *enrollmentRepository) GetByTeacherAndSection(teacherID, sectionID uint) ([]model.Enrollment, error) {
+	var enrollments []model.Enrollment
+	result := r.db.DB.
+		Joins("JOIN section ON enrollment.section_id = section.id").
+		Where("section.teacher_id = ? AND enrollment.section_id = ?", teacherID, sectionID).
+		Preload("Student").Preload("Section").
+		Preload("Section.Course").Preload("Section.Teacher").
+		Preload("Section.Classroom").Preload("Section.TimeSlot").
+		Find(&enrollments)
+	return enrollments, result.Error
+}
+
+// IsTeacherCourse 检查课程是否属于指定教师
+func (r *enrollmentRepository) IsTeacherCourse(teacherID, sectionID uint) (bool, error) {
+	var count int64
+	err := r.db.DB.Model(&model.Section{}).
+		Where("id = ? AND teacher_id = ?", sectionID, teacherID).
+		Count(&count).Error
+
+	return count > 0, err
 }
 
 // Create 创建选课记录

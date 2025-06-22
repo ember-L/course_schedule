@@ -348,24 +348,24 @@ const viewEnrollments = (record) => {
 };
 
 const handleModalOk = async () => {
-  formRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        if (isEdit.value) {
-          await studentApi.update(form.id, form);
-          Message.success('更新学生成功');
-        } else {
-          await studentApi.create(form);
-          Message.success('添加学生成功');
-        }
-        modalVisible.value = false;
-        await fetchStudents();
-      } catch (error) {
-        Message.error(isEdit.value ? '更新学生失败' : '添加学生失败');
-        console.error(error);
+  // formRef.value.validate(async (valid) => {
+  //   if (valid) {
+    try {
+      if (isEdit.value) {
+        await studentApi.update(form.id, form);
+        Message.success('更新学生成功');
+      } else {
+        await studentApi.create(form);
+        Message.success('添加学生成功');
       }
+      modalVisible.value = false;
+      await fetchStudents();
+    } catch (error) {
+      Message.error(isEdit.value ? '更新学生失败' : '添加学生失败');
+      console.error(error);
     }
-  });
+  //   }
+  // });
 };
 
 const deleteStudent = async (id) => {

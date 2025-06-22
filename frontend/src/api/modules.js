@@ -64,11 +64,14 @@ export const studentApi = {
 export const enrollmentApi = {
   getAll: () => api.get('/enrollments'),
   getByStudent: (studentId) => api.get(`/enrollments/student/${studentId}`),
+  getMy: () => api.get('/enrollments/my'),
+  getMyCourses: () => api.get('/enrollments/my-courses'),
+  getByTeacherSection: (sectionId) => api.get(`/enrollments/my-courses/${sectionId}`),
   create: (data) => api.post('/enrollments', data),
   delete: (id) => api.delete(`/enrollments/${id}`),
   updateGrade: (id, grade) => api.put(`/enrollments/${id}/grade`, { grade }),
   enroll: (data) => api.post('/enrollments/enroll', data),
-  drop: (data) => api.delete('/enrollments/drop', { data }),
+  drop: (id) => api.delete(`/enrollments/drop/${id}`),
 };
 
 // 课表相关API

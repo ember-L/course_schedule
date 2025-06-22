@@ -80,7 +80,7 @@ func main() {
 	timeSlotHandler := handler.NewTimeSlotHandler(timeSlotService)
 	sectionHandler := handler.NewSectionHandler(sectionService)
 	studentHandler := handler.NewStudentHandler(studentService)
-	enrollmentHandler := handler.NewEnrollmentHandler(enrollmentService)
+	enrollmentHandler := handler.NewEnrollmentHandler(enrollmentService, authService)
 	authHandler := handler.NewAuthHandler(authService)
 	scheduleHandler := handler.NewScheduleHandler(scheduleService, authService)
 

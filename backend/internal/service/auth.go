@@ -137,7 +137,9 @@ func (s *authService) StudentLogin(studentID, password string) (*model.LoginResp
 	if student == nil {
 		return nil, errors.New("用户名或密码错误")
 	}
-
+	hash_passwd, _ := repository.HashPassword(password)
+	fmt.Printf("生成的hash密码：%s 原来的密码：%s\n", hash_passwd, password)
+	fmt.Printf("验证密码：%s", student.Password)
 	// 验证密码
 	if !repository.CheckPasswordHash(password, student.Password) {
 		return nil, errors.New("用户名或密码错误")

@@ -26,7 +26,7 @@ type Teacher struct {
 	Name     string    `json:"name" gorm:"size:50;not null;index"`
 	Title    string    `json:"title" gorm:"size:50"`
 	Email    string    `json:"email" gorm:"size:100;uniqueIndex;not null"`
-	Password string    `json:"-" gorm:"size:100;not null;default:'$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'"`
+	Password string    `json:"-" gorm:"size:100;not null;default:'$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG'"`
 	Courses  []Course  `json:"courses,omitempty" gorm:"many2many:teacher_courses;joinForeignKey:teacher_id;joinReferences:course_id"`
 	Sections []Section `json:"sections,omitempty"`
 }
@@ -84,7 +84,7 @@ type Student struct {
 	Name        string       `json:"name" gorm:"size:50;not null;index"`
 	Grade       string       `json:"grade" gorm:"size:10;not null;index"` // 年级
 	Major       string       `json:"major" gorm:"size:50;not null;index"` // 专业
-	Password    string       `json:"-" gorm:"size:100;not null;default:'$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'"`
+	Password    string       `json:"-" gorm:"size:100;not null;default:'$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG'"`
 	Enrollments []Enrollment `json:"enrollments,omitempty"`
 }
 

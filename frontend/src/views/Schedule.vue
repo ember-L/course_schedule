@@ -122,7 +122,10 @@ import * as XLSX from 'xlsx';
 // 状态管理
 const authStore = useAuthStore();
 const loading = ref(false);
-const currentUser = ref(null);
+const currentUser = ref({
+  id: null,
+  name: null,
+});
 const students = ref([]);
 const teachers = ref([]);
 const sections = ref([]);
@@ -217,7 +220,8 @@ const loadCurrentUser = async () => {
       Message.error('用户信息获取失败');
       return false; // 返回false表示加载失败
     }
-    currentUser.value = userId;
+    currentUser.value.id = userId;
+    currentUser.value.name = authStore.currentUser?.name;
     return true; // 返回true表示加载成功
   } catch (error) {
     Message.error('获取用户信息失败');
