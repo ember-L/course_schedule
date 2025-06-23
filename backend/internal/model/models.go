@@ -125,3 +125,33 @@ type ChangePasswordRequest struct {
 	OldPassword string `json:"oldPassword" validate:"required"`
 	NewPassword string `json:"newPassword" validate:"required,min=6"`
 }
+
+// 自动排课请求结构体
+// 用于自动排课API和service
+// courseId, teacherId, semester, maxStudents
+type AutoScheduleRequest struct {
+	CourseID    uint   `json:"courseId"`
+	TeacherID   uint   `json:"teacherId"`
+	Semester    string `json:"semester"`
+	MaxStudents int    `json:"maxStudents"`
+}
+
+// 系统参数模型
+// 只保留一条记录，id=1
+
+type SystemConfig struct {
+	ID        uint   `gorm:"primaryKey" json:"id"`
+	Semester  string `json:"semester"`
+	StartDate string `json:"startDate"` // 学期起始日期，格式yyyy-MM-dd
+	UpdatedAt string `json:"updatedAt"`
+}
+
+// 公告模型
+
+type Announcement struct {
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}

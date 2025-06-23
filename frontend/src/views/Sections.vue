@@ -3,6 +3,7 @@
     <a-card title="排课管理">
       <template #extra>
         <a-button type="primary" @click="showAddModal">添加排课</a-button>
+        <a-button type="primary" style="margin-left: 12px" @click="showAutoModal">自动排课</a-button>
       </template>
       
       <a-row :gutter="16" style="margin-bottom: 16px">
@@ -99,6 +100,36 @@
         </a-form-item>
       </a-form>
     </a-modal>
+    
+    <a-modal
+      v-model:visible="autoModalVisible"
+      title="自动排课"
+      @ok="handleAutoSchedule"
+      @cancel="autoModalVisible = false"
+    >
+      <a-form :model="autoForm" ref="autoFormRef" :rules="autoRules">
+        <a-form-item field="courseId" label="课程">
+          <a-select v-model="autoForm.courseId" placeholder="请选择课程">
+            <a-option v-for="course in courses" :key="course.id" :value="course.id">
+              {{ course.name }}
+            </a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item field="teacherId" label="教师">
+          <a-select v-model="autoForm.teacherId" placeholder="请选择教师">
+            <a-option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">
+              {{ teacher.name }}
+            </a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item field="semester" label="学期">
+          <a-input v-model="autoForm.semester" placeholder="请输入学期，如：2023-2024-1" />
+        </a-form-item>
+        <a-form-item field="maxStudents" label="最大学生数">
+          <a-input-number v-model="autoForm.maxStudents" placeholder="请输入最大学生数" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -119,6 +150,20 @@ const isEdit = ref(false);
 const formRef = ref(null);
 const filterSemester = ref('');
 const filterCourse = ref('');
+const autoModalVisible = ref(false);
+const autoFormRef = ref(null);
+const autoForm = reactive({
+  courseId: null,
+  teacherId: null,
+  semester: '',
+  maxStudents: 0
+});
+const autoRules = {
+  courseId: [{ required: true, message: '请选择课程' }],
+  teacherId: [{ required: true, message: '请选择教师' }],
+  semester: [{ required: true, message: '请输入学期' }],
+  maxStudents: [{ required: true, type: 'number', message: '请输入最大学生数' }]
+};
 
 const form = reactive({
   id: null,
@@ -295,6 +340,34 @@ const deleteSection = async (id) => {
     Message.error('删除排课失败');
     console.error(error);
   }
+};
+
+const showAutoModal = () => {
+  autoForm.courseId = null;
+  autoForm.teacherId = null;
+  autoForm.semester = '';
+  autoForm.maxStudents = 0;
+  autoModalVisible.value = true;
+};
+
+const handleAutoSchedule = async () => {
+  // autoFormRef.value.validate(async (valid) => {
+  //   if (!valid) return;
+    try {
+      await sectionApi.autoSchedule({
+        courseId: autoForm.courseId,
+        teacherId: autoForm.teacherId,
+        semester: autoForm.semester,
+        maxStudents: autoForm.maxStudents
+      });
+      Message.success('自动排课成功');
+      autoModalVisible.value = false;
+      await fetchAllData();
+    } catch (error) {
+      Message.error(error?.response?.data?.error || '自动排课失败');
+      console.error(error);
+    }
+  // });
 };
 </script>
 

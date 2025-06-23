@@ -48,6 +48,7 @@ export const sectionApi = {
   checkConflict: (data) => api.post('/sections/check-conflict', data),
   getByTeacher: (teacherId) => api.get(`/sections/teacher/${teacherId}`),
   getByStudent: (studentId) => api.get(`/sections/student/${studentId}`),
+  autoSchedule: (data) => api.post('/sections/auto-schedule', data),
 };
 
 // 学生相关API
@@ -82,4 +83,18 @@ export const scheduleApi = {
   getStudentSchedule: (studentId) => api.get(`/schedule/student/${studentId}`),
   getTeacherSchedule: (teacherId) => api.get(`/schedule/teacher/${teacherId}`),
   exportSchedule: (params) => api.get('/schedule/export', { params }),
+};
+
+// 系统参数API
+export const systemApi = {
+  getConfig: () => api.get('/system/config'),
+  updateConfig: (data) => api.put('/system/config', data),
+};
+
+// 公告API
+export const announcementApi = {
+  getAll: () => api.get('/announcements'),
+  create: (data) => api.post('/announcements', data),
+  update: (id, data) => api.put(`/announcements/${id}`, data),
+  delete: (id) => api.delete(`/announcements/${id}`),
 };

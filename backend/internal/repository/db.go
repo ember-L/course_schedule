@@ -59,6 +59,8 @@ func (d *Database) AutoMigrate() error {
 		&model.Student{},
 		&model.Enrollment{},
 		&model.AdminAuth{},
+		&model.Announcement{},
+		&model.SystemConfig{},
 	)
 	if err != nil {
 		return err

@@ -4,6 +4,9 @@
     <div class="page-header">
       <h1 class="page-title">欢迎回来，{{ userInfo.name }}</h1>
       <p class="page-subtitle">{{ welcomeMessage }}</p>
+      <a-button v-if="isAdmin" type="primary" size="small" style="margin-top: 8px;" @click="editConfig">
+        <icon-settings style="margin-right:4px"/>学期/周次管理
+      </a-button>
     </div>
 
     <!-- 统计卡片 -->
@@ -26,7 +29,12 @@
             <icon-book />
           </div>
           <div class="statistic-info">
-            <div class="statistic-value">{{ currentSemester }}</div>
+            <div class="statistic-value">
+              {{ currentSemester }}
+              <a-button v-if="isAdmin" type="text" size="mini" @click="editConfig" style="margin-left: 4px;">
+                <icon-edit />
+              </a-button>
+            </div>
             <div class="statistic-label">当前学期</div>
           </div>
         </div>
@@ -44,6 +52,21 @@
         </div>
       </div>
     </div>
+
+    <!-- 学期/周次编辑弹窗 -->
+    <a-modal v-model:visible="editConfigVisible" title="编辑学期与周次" @ok="handleConfigSave" :confirm-loading="configLoading" @cancel="editConfigVisible=false">
+      <a-form :model="{editSemester,editStartDate}">
+        <a-form-item label="学期">
+          <a-input v-model="editSemester" placeholder="如2023-2024-2" />
+        </a-form-item>
+        <a-form-item label="学期起始日期">
+          <a-date-picker v-model="editStartDate" format="YYYY-MM-DD" style="width:100%" />
+        </a-form-item>
+        <a-form-item label="当前周次">
+          <a-input v-model="currentWeek" readonly />
+        </a-form-item>
+      </a-form>
+    </a-modal>
 
     <!-- 主要内容区域 -->
     <div class="main-content">
@@ -91,16 +114,18 @@
       <!-- 通知公告 -->
       <a-card class="announcements-card" title="通知公告">
         <template #extra>
-          <a-button type="text" size="small">
-            <icon-more />
+          <a-button v-if="isAdmin" type="primary" size="small" @click="newAnnVisible=true">
+            <icon-plus /> 发布公告
           </a-button>
         </template>
         
         <div class="announcements-list">
           <div 
-            v-for="(notice, index) in announcements" 
-            :key="index"
+            v-for="notice in announcements" 
+            :key="notice.id"
             class="announcement-item"
+            @click="showAnnDetail(notice)"
+            style="cursor:pointer;"
           >
             <div class="announcement-content">
               <div class="announcement-title">{{ notice.title }}</div>
@@ -108,10 +133,29 @@
             </div>
             <div class="announcement-badge">
               <a-tag size="small" color="blue">新</a-tag>
+              <a-popconfirm v-if="isAdmin" title="确定删除该公告？" @ok="() => handleAnnDelete(notice.id)">
+                <a-button type="text" size="mini" status="danger"><icon-delete /></a-button>
+              </a-popconfirm>
             </div>
           </div>
         </div>
       </a-card>
+      <!-- 发布公告弹窗 -->
+      <a-modal v-model:visible="newAnnVisible" title="发布公告" @ok="handleAnnCreate" :confirm-loading="annLoading" @cancel="newAnnVisible=false">
+        <a-form :model="{newAnnTitle,newAnnContent}">
+          <a-form-item label="标题">
+            <a-input v-model="newAnnTitle" placeholder="请输入公告标题" />
+          </a-form-item>
+          <a-form-item label="内容">
+            <a-textarea v-model="newAnnContent" placeholder="请输入公告内容" :auto-size="{minRows:3,maxRows:6}" />
+          </a-form-item>
+        </a-form>
+      </a-modal>
+      <!-- 公告详情弹窗 -->
+      <a-modal v-model:visible="annDetailVisible" :title="annDetail.title" footer="null" @cancel="annDetailVisible=false">
+        <div style="white-space:pre-line;min-height:60px;">{{ annDetail.content }}</div>
+        <div style="margin-top:16px;color:#888;font-size:13px;">发布时间：{{ annDetail.date }}</div>
+      </a-modal>
     </div>
   </div>
 </template>
@@ -120,14 +164,19 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/store/authStore';
 import {scheduleApi} from '@/api/modules.js'
+import { systemApi, announcementApi } from '@/api/modules.js'
 
 
 const authStore = useAuthStore();
 const userInfo = computed(() => authStore.currentUser || {});
 const loading = ref(true);
 const todayClasses = ref([]);
-const currentSemester = ref('2023-2024-2');
-const currentWeek = ref(12);
+const currentSemester = ref('');
+const currentWeek = ref(1);
+const announcements = ref([]);
+const configLoading = ref(false);
+const annLoading = ref(false);
+
 // 计算属性
 const isAdmin = computed(() => authStore.isAdmin);
 const isTeacher = computed(() => authStore.isTeacher);
@@ -154,12 +203,82 @@ const welcomeMessage = computed(() => {
   return '夜深了，请注意休息！';
 });
 
-// 模拟数据 - 实际应用中应从API获取
-const announcements = ref([
-  { title: '关于2023-2024学年第二学期选课的通知', date: '2024-02-15' },
-  { title: '期中考试安排', date: '2024-03-20' },
-  { title: '关于五一假期调课安排', date: '2024-04-25' }
-]);
+// 管理员编辑面板
+const editConfigVisible = ref(false);
+const editSemester = ref('');
+const editStartDate = ref('');
+const editConfig = () => {
+  editSemester.value = currentSemester.value;
+  editStartDate.value = startDate.value;
+  editConfigVisible.value = true;
+};
+const handleConfigSave = async () => {
+  configLoading.value = true;
+  try {
+    await systemApi.updateConfig({ semester: editSemester.value, startDate: editStartDate.value });
+    currentSemester.value = editSemester.value;
+    startDate.value = editStartDate.value;
+    editConfigVisible.value = false;
+    await fetchConfig();
+  } catch (e) {
+    window.$message?.error('更新失败');
+  } finally {
+    configLoading.value = false;
+  }
+};
+
+// 公告管理
+const newAnnVisible = ref(false);
+const newAnnTitle = ref('');
+const newAnnContent = ref('');
+const handleAnnCreate = async () => {
+  annLoading.value = true;
+  try {
+    await announcementApi.create({ title: newAnnTitle.value, content: newAnnContent.value });
+    await fetchAnnouncements();
+    newAnnVisible.value = false;
+    newAnnTitle.value = '';
+    newAnnContent.value = '';
+  } catch (e) {
+    window.$message?.error('发布失败');
+  } finally {
+    annLoading.value = false;
+  }
+};
+const handleAnnDelete = async (id) => {
+  annLoading.value = true;
+  try {
+    await announcementApi.delete(id);
+    await fetchAnnouncements();
+  } catch (e) {
+    window.$message?.error('删除失败');
+  } finally {
+    annLoading.value = false;
+  }
+};
+
+// 获取系统参数
+const fetchConfig = async () => {
+  try {
+    const res = await systemApi.getConfig();
+    currentSemester.value = res.semester;
+    startDate.value = res.startDate;
+    currentWeek.value = res.currentWeek;
+  } catch (e) {
+    currentSemester.value = '未知';
+    startDate.value = '';
+    currentWeek.value = 1;
+  }
+};
+// 获取公告
+const fetchAnnouncements = async () => {
+  try {
+    const res = await announcementApi.getAll();
+    announcements.value = (res || []).map(a => ({ ...a, date: a.createdAt?.slice(0,10) }));
+  } catch (e) {
+    announcements.value = [];
+  }
+};
 
 // 获取当日课表
 const fetchTodaySchedule = async () => {
@@ -211,7 +330,17 @@ const getTimeStatus = (startTime, endTime) => {
   }
 };
 
+const startDate = ref('');
+const annDetailVisible = ref(false);
+const annDetail = ref({});
+const showAnnDetail = (notice) => {
+  annDetail.value = notice;
+  annDetailVisible.value = true;
+};
+
 onMounted(() => {
+  fetchConfig();
+  fetchAnnouncements();
   fetchTodaySchedule();
 });
 </script>

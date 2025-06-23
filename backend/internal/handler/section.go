@@ -3,6 +3,7 @@ package handler
 import (
 	"course_schedule/internal/model"
 	"course_schedule/internal/service"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -32,6 +33,7 @@ func (h *SectionHandler) Register(e *echo.Echo) {
 	sections.POST("/check-conflict", h.CheckConflict)
 	sections.GET("/teacher/:teacherId", h.GetByTeacher)
 	sections.GET("/student/:studentId", h.GetByStudent)
+	sections.POST("/auto-schedule", h.AutoSchedule)
 }
 
 // GetAll 获取所有课程安排
@@ -156,4 +158,21 @@ func (h *SectionHandler) CheckConflict(c echo.Context) error {
 		"hasConflict": hasConflict,
 		"message":     message,
 	})
+}
+
+// AutoSchedule 自动排课
+func (h *SectionHandler) AutoSchedule(c echo.Context) error {
+	var req model.AutoScheduleRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "参数错误"})
+	}
+	fmt.Print("开始自动排课")
+	// 获取ClassroomService和TimeSlotService
+	classroomService := c.Get("classroomService").(service.ClassroomService)
+	timeSlotService := c.Get("timeSlotService").(service.TimeSlotService)
+	section, err := h.sectionService.AutoSchedule(&req, classroomService, timeSlotService)
+	if err != nil {
+		return c.JSON(http.StatusConflict, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, section)
 }

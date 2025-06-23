@@ -73,6 +73,14 @@ func main() {
 	authService := service.NewAuthService(authRepo, cfg.Auth.JWTSecret, cfg.Auth.JWTDuration)
 	scheduleService := service.NewScheduleService(sectionService)
 
+	// 初始化SystemConfig和Announcement相关依赖
+	announcementRepo := repository.NewAnnouncementRepository(db)
+	systemConfigRepo := repository.NewSystemConfigRepository(db)
+	announcementService := service.NewAnnouncementService(announcementRepo)
+	systemConfigService := service.NewSystemConfigService(systemConfigRepo)
+	announcementHandler := handler.NewAnnouncementHandler(announcementService, authService)
+	systemConfigHandler := handler.NewSystemConfigHandler(systemConfigService, authService)
+
 	// 初始化处理器
 	courseHandler := handler.NewCourseHandler(courseService, authService)
 	teacherHandler := handler.NewTeacherHandler(teacherService, authService)
@@ -88,6 +96,15 @@ func main() {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 
+	// 设置全局中间件，注入ClassroomService和TimeSlotService到context
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("classroomService", classroomService)
+			c.Set("timeSlotService", timeSlotService)
+			return next(c)
+		}
+	})
+
 	// 设置中间件
 	handler.SetupMiddlewares(e)
 
@@ -101,6 +118,8 @@ func main() {
 	enrollmentHandler.Register(e)
 	authHandler.Register(e)
 	scheduleHandler.Register(e)
+	announcementHandler.Register(e)
+	systemConfigHandler.Register(e)
 
 	// 启动服务器
 	serverAddr := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)

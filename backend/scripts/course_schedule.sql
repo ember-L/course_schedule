@@ -11,7 +11,7 @@
  Target Server Version : 80030
  File Encoding         : 65001
 
- Date: 16/06/2025 23:04:42
+ Date: 24/06/2025 00:10:29
 */
 
 SET NAMES utf8mb4;
@@ -38,6 +38,24 @@ CREATE TABLE `admin_auth`  (
 -- Records of admin_auth
 -- ----------------------------
 INSERT INTO `admin_auth` VALUES (1, '2025-06-11 00:34:03.153', '2025-06-11 00:34:03.153', NULL, 'admin', '$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG', '系统管理员');
+
+-- ----------------------------
+-- Table structure for announcement
+-- ----------------------------
+DROP TABLE IF EXISTS `announcement`;
+CREATE TABLE `announcement`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `created_at` datetime(3) NULL DEFAULT NULL,
+  `updated_at` datetime(3) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of announcement
+-- ----------------------------
+INSERT INTO `announcement` VALUES (1, '端午节放假公告', '端午节放假5天', '2025-06-24 00:10:04.177', '2025-06-24 00:10:04.177');
 
 -- ----------------------------
 -- Table structure for classroom
@@ -89,7 +107,7 @@ CREATE TABLE `course`  (
   UNIQUE INDEX `idx_course_code`(`code`) USING BTREE,
   INDEX `idx_course_deleted_at`(`deleted_at`) USING BTREE,
   INDEX `idx_course_name`(`name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of course
@@ -104,6 +122,7 @@ INSERT INTO `course` VALUES (7, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.
 INSERT INTO `course` VALUES (8, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 'ENG101', '大学英语I', 3, '英语听说读写基础训练');
 INSERT INTO `course` VALUES (9, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 'ENG102', '大学英语II', 3, '英语听说读写进阶训练');
 INSERT INTO `course` VALUES (10, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 'MGT101', '管理学原理', 3, '管理学基本理论和方法');
+INSERT INTO `course` VALUES (12, '2025-06-22 12:03:31.968', '2025-06-22 12:03:31.968', NULL, 'CS108', '计算机网络基础', 4, '');
 
 -- ----------------------------
 -- Table structure for enrollment
@@ -124,20 +143,20 @@ CREATE TABLE `enrollment`  (
   INDEX `idx_enrollment_section_id`(`section_id`) USING BTREE,
   CONSTRAINT `fk_section_enrollments` FOREIGN KEY (`section_id`) REFERENCES `section` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_student_enrollments` FOREIGN KEY (`student_id`) REFERENCES `student` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of enrollment
 -- ----------------------------
 INSERT INTO `enrollment` VALUES (1, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 1, 1, '2025-06-15 15:50:33.000', NULL);
 INSERT INTO `enrollment` VALUES (2, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 1, 3, '2025-06-15 15:50:33.000', NULL);
-INSERT INTO `enrollment` VALUES (3, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 1, 6, '2025-06-15 15:50:33.000', NULL);
-INSERT INTO `enrollment` VALUES (4, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 2, 1, '2025-06-15 15:50:33.000', NULL);
+INSERT INTO `enrollment` VALUES (3, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', '2025-06-20 23:20:06.820', 1, 6, '2025-06-15 15:50:33.000', NULL);
+INSERT INTO `enrollment` VALUES (4, '2025-06-15 15:50:33.000', '2025-06-21 10:10:56.618', NULL, 2, 1, '2025-06-15 15:50:33.000', '12');
 INSERT INTO `enrollment` VALUES (5, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 2, 3, '2025-06-15 15:50:33.000', NULL);
 INSERT INTO `enrollment` VALUES (6, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 2, 8, '2025-06-15 15:50:33.000', NULL);
-INSERT INTO `enrollment` VALUES (7, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 3, 2, '2025-06-15 15:50:33.000', NULL);
+INSERT INTO `enrollment` VALUES (7, '2025-06-15 15:50:33.000', '2025-06-22 12:49:01.576', NULL, 3, 2, '2025-06-15 15:50:33.000', '20');
 INSERT INTO `enrollment` VALUES (8, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 3, 5, '2025-06-15 15:50:33.000', NULL);
-INSERT INTO `enrollment` VALUES (9, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 4, 4, '2025-06-15 15:50:33.000', NULL);
+INSERT INTO `enrollment` VALUES (9, '2025-06-15 15:50:33.000', '2025-06-21 17:01:44.837', NULL, 4, 4, '2025-06-15 15:50:33.000', '89');
 INSERT INTO `enrollment` VALUES (10, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 4, 7, '2025-06-15 15:50:33.000', NULL);
 INSERT INTO `enrollment` VALUES (11, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 5, 4, '2025-06-15 15:50:33.000', NULL);
 INSERT INTO `enrollment` VALUES (12, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 5, 10, '2025-06-15 15:50:33.000', NULL);
@@ -147,6 +166,7 @@ INSERT INTO `enrollment` VALUES (15, '2025-06-15 15:50:33.000', '2025-06-15 15:5
 INSERT INTO `enrollment` VALUES (16, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 8, 7, '2025-06-15 15:50:33.000', NULL);
 INSERT INTO `enrollment` VALUES (17, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 9, 8, '2025-06-15 15:50:33.000', NULL);
 INSERT INTO `enrollment` VALUES (18, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 10, 9, '2025-06-15 15:50:33.000', NULL);
+INSERT INTO `enrollment` VALUES (19, '2025-06-22 11:54:43.044', '2025-06-22 11:54:43.044', NULL, 3, 3, '2025-06-22 11:54:43.044', '');
 
 -- ----------------------------
 -- Table structure for section
@@ -174,13 +194,13 @@ CREATE TABLE `section`  (
   CONSTRAINT `fk_course_sections` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_teacher_sections` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `fk_time_slot_sections` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of section
 -- ----------------------------
-INSERT INTO `section` VALUES (1, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 1, 1, 1, 1, '2023-2024-1', 50);
-INSERT INTO `section` VALUES (2, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 2, 1, 1, 5, '2023-2024-1', 50);
+INSERT INTO `section` VALUES (1, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 1, 1, 1, 22, '2023-2024-1', 50);
+INSERT INTO `section` VALUES (2, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 2, 1, 1, 21, '2023-2024-1', 50);
 INSERT INTO `section` VALUES (3, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 3, 2, 3, 2, '2023-2024-1', 60);
 INSERT INTO `section` VALUES (4, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 4, 3, 8, 3, '2023-2024-1', 40);
 INSERT INTO `section` VALUES (5, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 5, 4, 3, 6, '2023-2024-1', 60);
@@ -189,6 +209,8 @@ INSERT INTO `section` VALUES (7, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33
 INSERT INTO `section` VALUES (8, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 8, 6, 10, 4, '2023-2024-1', 30);
 INSERT INTO `section` VALUES (9, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 9, 6, 10, 8, '2023-2024-1', 30);
 INSERT INTO `section` VALUES (10, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 10, 7, 5, 11, '2023-2024-1', 80);
+INSERT INTO `section` VALUES (11, '2025-06-23 22:21:58.174', '2025-06-23 22:21:58.174', NULL, 2, 3, 1, 1, '2023-2024-1', 33);
+INSERT INTO `section` VALUES (12, '2025-06-23 23:40:27.811', '2025-06-23 23:40:27.811', NULL, 5, 4, 2, 1, '2023-2024-1', 23);
 
 -- ----------------------------
 -- Table structure for student
@@ -203,28 +225,48 @@ CREATE TABLE `student`  (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `grade` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `major` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_student_student_id`(`student_id`) USING BTREE,
   INDEX `idx_student_deleted_at`(`deleted_at`) USING BTREE,
   INDEX `idx_student_name`(`name`) USING BTREE,
   INDEX `idx_student_grade`(`grade`) USING BTREE,
   INDEX `idx_student_major`(`major`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of student
 -- ----------------------------
-INSERT INTO `student` VALUES (1, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2023001', '张三', '大一', '计算机科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (2, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2023002', '李四', '大一', '软件工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (3, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2023003', '王五', '大一', '数据科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (4, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2022001', '赵六', '大二', '计算机科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (5, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2022002', '钱七', '大二', '软件工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (6, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2022003', '孙八', '大二', '人工智能', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (7, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2021001', '周九', '大三', '计算机科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (8, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2021002', '吴十', '大三', '软件工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (9, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2021003', '郑十一', '大三', '网络工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
-INSERT INTO `student` VALUES (10, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2020001', '王十二', '大四', '计算机科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (1, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2023001', '张三', '2024级', '计算机科学', '$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG');
+INSERT INTO `student` VALUES (2, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2023002', '李四', '2024级', '软件工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (3, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2023003', '王五', '2024级', '数据科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (4, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2022001', '赵六', '2024级', '计算机科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (5, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2022002', '钱七', '2024级', '软件工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (6, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2022003', '孙八', '2024级', '人工智能', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (7, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2021001', '周九', '2024级', '计算机科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (8, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2021002', '吴十', '2024级', '软件工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (9, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2021003', '郑十一', '2024级', '网络工程', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (10, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '2020001', '王十二', '2024级', '计算机科学', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (11, '2025-06-23 00:35:02.818', '2025-06-23 00:35:02.818', '2025-06-23 01:26:06.039', '20240001', 'ember', '2024级', '计算机科学与技术', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `student` VALUES (13, '2025-06-23 01:27:43.183', '2025-06-23 01:27:43.183', NULL, '20240002', 'ember1', '2021级', '软件工程', '$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG');
+
+-- ----------------------------
+-- Table structure for system_config
+-- ----------------------------
+DROP TABLE IF EXISTS `system_config`;
+CREATE TABLE `system_config`  (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `semester` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `week` bigint NULL DEFAULT NULL,
+  `updated_at` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `start_date` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of system_config
+-- ----------------------------
+INSERT INTO `system_config` VALUES (1, '2024-2025-1', 3, '', '2025-03-01');
 
 -- ----------------------------
 -- Table structure for teacher
@@ -238,7 +280,7 @@ CREATE TABLE `teacher`  (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_teacher_email`(`email`) USING BTREE,
   INDEX `idx_teacher_deleted_at`(`deleted_at`) USING BTREE,
@@ -248,7 +290,7 @@ CREATE TABLE `teacher`  (
 -- ----------------------------
 -- Records of teacher
 -- ----------------------------
-INSERT INTO `teacher` VALUES (1, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '张教授', '教授', 'zhang@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+INSERT INTO `teacher` VALUES (1, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '张教授', '教授', 'zhang@university.edu', '$2a$10$PHgi3Chxn0wCITDFBXOHWO9ipIjRvkS1cewy8dTeel.ahCJQJ4HGG');
 INSERT INTO `teacher` VALUES (2, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '李副教授', '副教授', 'li@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
 INSERT INTO `teacher` VALUES (3, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '王讲师', '讲师', 'wang@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
 INSERT INTO `teacher` VALUES (4, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, '刘教授', '教授', 'liu@university.edu', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
@@ -275,6 +317,11 @@ CREATE TABLE `teacher_courses`  (
 -- ----------------------------
 -- Records of teacher_courses
 -- ----------------------------
+INSERT INTO `teacher_courses` VALUES (1, 1);
+INSERT INTO `teacher_courses` VALUES (2, 2);
+INSERT INTO `teacher_courses` VALUES (2, 3);
+INSERT INTO `teacher_courses` VALUES (3, 4);
+INSERT INTO `teacher_courses` VALUES (1, 5);
 
 -- ----------------------------
 -- Table structure for time_slot
@@ -291,7 +338,7 @@ CREATE TABLE `time_slot`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_time_slot_deleted_at`(`deleted_at`) USING BTREE,
   INDEX `idx_time_slot_day_of_week`(`day_of_week`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of time_slot
@@ -316,5 +363,9 @@ INSERT INTO `time_slot` VALUES (17, '2025-06-15 15:50:33.000', '2025-06-15 15:50
 INSERT INTO `time_slot` VALUES (18, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 5, '10:00', '11:40');
 INSERT INTO `time_slot` VALUES (19, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 5, '14:00', '15:40');
 INSERT INTO `time_slot` VALUES (20, '2025-06-15 15:50:33.000', '2025-06-15 15:50:33.000', NULL, 5, '16:00', '17:40');
+INSERT INTO `time_slot` VALUES (21, NULL, NULL, NULL, 6, '08:00', '09:40');
+INSERT INTO `time_slot` VALUES (22, NULL, NULL, NULL, 6, '10:00', '11:40');
+INSERT INTO `time_slot` VALUES (23, NULL, NULL, NULL, 6, '14:00', '15:40');
+INSERT INTO `time_slot` VALUES (24, NULL, NULL, NULL, 6, '16:00', '17:40');
 
 SET FOREIGN_KEY_CHECKS = 1;
